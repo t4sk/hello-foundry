@@ -2,8 +2,8 @@
 
 https://book.getfoundry.sh/
 
-- install
-- init
+- [ ] install
+- [ ] init
 - compile
 - test (match, verbose)
 - hello world
@@ -30,3 +30,16 @@ https://book.getfoundry.sh/
 - tutorials
 - refs
 - vyper?
+
+### Install (Linux)
+
+```shell
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+### Init
+
+```shell
+
+```
