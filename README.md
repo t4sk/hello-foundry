@@ -4,9 +4,18 @@ https://book.getfoundry.sh/
 
 - [ ] install
 - [ ] init
-- compile
-- test (match, verbose)
+- [ ] basic commands - compile and test
+- [ ] solc version and optimizer settings
 - hello world
+  - [ ] fmt
+  - [ ] test
+
+```shell
+forge fmt
+forge test --match-path test/HelloWorld -vvvv
+```
+
+- test (match, verbose, gas report)
 - counter app
 - auth
 - time
@@ -20,10 +29,12 @@ https://book.getfoundry.sh/
 - remapping
 - mainnet fork
 - crosschain fork
-- fuzzing
+- fuzzing, settings
 - differential testing
 
+- formatter
 - chisel
+- debugger
 
 # TODO:
 
@@ -41,5 +52,10 @@ foundryup
 ### Init
 
 ```shell
-
+forge init
 ```
+
+# TODO:
+
+- [ ] set build dir?
+- [ ] skip compile on test?
