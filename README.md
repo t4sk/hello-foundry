@@ -29,3 +29,4 @@ https://book.getfoundry.sh/
 
 - tutorials
 - refs
+- vyper?
