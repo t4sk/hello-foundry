@@ -54,8 +54,3 @@ foundryup
 ```shell
 forge init
 ```
-
-# TODO:
-
-- [ ] set build dir?
-- [ ] skip compile on test?
