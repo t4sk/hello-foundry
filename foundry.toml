@@ -5,4 +5,7 @@ libs = ['lib']
 solc_version = "0.8.18"
 optimizer = true
 optimizer_runs = 200
+# fs_permissions = [{ access = "read-write", path = "./"}]
+fs_permissions = [{ access = "read", path = "./out"}]
+
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -7,18 +7,31 @@ import "../src/Counter.sol";
 contract CounterTest is Test {
     Counter public counter;
 
+    // invoked before each test
     function setUp() public {
         counter = new Counter();
-        counter.setNumber(0);
     }
 
-    function testIncrement() public {
-        counter.increment();
-        assertEq(counter.number(), 1);
+    // test must be external or public
+    function testInc() public {
+        counter.inc();
+        assertEq(counter.count(), 1);
     }
 
-    function testSetNumber(uint256 x) public {
-        counter.setNumber(x);
-        assertEq(counter.number(), x);
+    function testFailDec() public {
+        counter.dec();
+    }
+
+    // Same as testFailDec
+    function testDecUnderflow() public {
+        vm.expectRevert(stdError.arithmeticError);
+        counter.dec();
+    }
+
+    function testDec() public {
+        counter.inc();
+        counter.inc();
+        counter.dec();
+        assertEq(counter.count(), 1);
     }
 }
