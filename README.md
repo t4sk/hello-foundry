@@ -27,16 +27,20 @@ forge test --match-path test/HelloWorld -vvvv
 forge test --match-path test/Counter.t.sol -vvv --gas-report
 ```
 
+- console
+
+```shell
+forge test --match-path test/Console.t.sol -vv
+```
+
 - auth
 - time
 - send eth
 - event
-- test fail
 - test custom error
-- label for error?
+- test label for error?
 - test signature
 - cheatcode
-- console
 - remapping
 - mainnet fork
 - crosschain fork
