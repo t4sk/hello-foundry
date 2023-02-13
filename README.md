@@ -3,7 +3,18 @@
 https://book.getfoundry.sh/
 
 - [ ] install
+
+```shell
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
 - [ ] init
+
+```shell
+forge init
+```
+
 - [ ] basic commands - compile and test
 - [ ] solc version and optimizer settings
 - hello world
@@ -56,16 +67,3 @@ forge test --match-path test/Console.t.sol -vv
 - tutorials
 - refs
 - vyper?
-
-### Install (Linux)
-
-```shell
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
-
-### Init
-
-```shell
-forge init
-```
