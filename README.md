@@ -44,9 +44,10 @@ forge test --match-path test/Counter.t.sol -vvv --gas-report
 forge test --match-path test/Console.t.sol -vv
 ```
 
-- auth
+- [ ] auth
 - time
 - send eth
+  - [ ] deal
 - event
 - test custom error
 - test label for error?
