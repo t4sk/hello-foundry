@@ -45,10 +45,10 @@ forge test --match-path test/Console.t.sol -vv
 ```
 
 - [ ] auth
-- time
+- [ ]event
+- [ ] time
 - send eth
   - [ ] deal
-- event
 - test custom error
 - test label for error?
 - test signature
@@ -65,6 +65,7 @@ forge test --match-path test/Console.t.sol -vv
 
 # TODO:
 
+- [ ] std storage
 - tutorials
 - refs
 - vyper?
