@@ -45,12 +45,13 @@ forge test --match-path test/Console.t.sol -vv
 ```
 
 - [ ] auth
-- [ ]event
+- [ ] event (expectEmit)
+- [ ] test error (expectRevert)
+- test label for error?
+- [ ] expectCall
 - [ ] time
 - send eth
   - [ ] deal
-- test custom error
-- test label for error?
 - test signature
 - cheatcode
 - remapping
