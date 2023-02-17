@@ -47,9 +47,8 @@ forge test --match-path test/Console.t.sol -vv
 - [ ] auth
 - [ ] event (expectEmit)
 - [ ] test error (expectRevert)
-- test label for error?
-- [ ] expectCall
 - [ ] time
+- test label for error?
 - send eth
   - [ ] deal
 - test signature
