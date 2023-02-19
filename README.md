@@ -49,8 +49,8 @@ forge test --match-path test/Console.t.sol -vv
 - [ ] test error (expectRevert)
 - [ ] time
 - [ ] test label for error
-- send eth
-  - [ ] deal
+- [ ] send eth
+  - [ ] deal, hoax
 - test signature
 - cheatcode
 - test multisig?
