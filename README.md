@@ -51,13 +51,13 @@ forge test --match-path test/Console.t.sol -vv
 - [ ] test label for error
 - [ ] send eth
   - [ ] deal, hoax
-- test signature
+- [ ] signature
 - cheatcode
 - test multisig?
 - remapping
 - mainnet fork
 - crosschain fork
-- [ ] fuzzing
+- fuzzing
 - invariant
 - differential testing
 
