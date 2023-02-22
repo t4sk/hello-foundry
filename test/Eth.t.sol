@@ -34,6 +34,5 @@ contract EthTest is Test {
 
         assertEq(address(1).balance, 1e18 - 456);
         assertEq(address(wallet).balance, 123 + 456);
-
     }
 }

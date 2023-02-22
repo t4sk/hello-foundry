@@ -57,7 +57,7 @@ forge test --match-path test/Console.t.sol -vv
 - remapping
 - mainnet fork
 - crosschain fork
-- fuzzing
+- [ ] fuzzing
 - invariant
 - differential testing
 
