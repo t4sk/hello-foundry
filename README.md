@@ -1,5 +1,9 @@
 # hello-foundry
 
+```shell
+npm i
+```
+
 https://book.getfoundry.sh/
 
 - [ ] install
@@ -53,10 +57,14 @@ forge test --match-path test/Console.t.sol -vv
   - [ ] deal, hoax
 - [ ] signature
 - cheatcode
-- remapping
+- [ ] remapping
 ```shell
 forge remappings
 forge install rari-capital/solmate
+forge update lib/solmate
+forge remove solmate
+
+npm i @openzeppelin/contracts
 ```
 - test multisig?
 - mainnet fork
