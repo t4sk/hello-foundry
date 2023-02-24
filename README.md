@@ -53,8 +53,12 @@ forge test --match-path test/Console.t.sol -vv
   - [ ] deal, hoax
 - [ ] signature
 - cheatcode
-- test multisig?
 - remapping
+```shell
+forge remappings
+forge install rari-capital/solmate
+```
+- test multisig?
 - mainnet fork
 - crosschain fork
 - [ ] fuzzing
