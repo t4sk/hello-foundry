@@ -13,19 +13,19 @@ contract FuzzTest is Test {
         b = new Bit();
     }
 
-    function mostSignificantBit(uint x) private pure returns (uint) {
-        uint i = 0;
+    function mostSignificantBit(uint256 x) private pure returns (uint256) {
+        uint256 i = 0;
         while ((x >>= 1) > 0) {
             ++i;
         }
         return i;
     }
 
-    function testMostSignificantBit(uint x) public {
+    function testMostSignificantBit(uint256 x) public {
         // Exclude i = 0
         vm.assume(x > 0);
 
-        uint i = b.mostSignificantBit(x);
+        uint256 i = b.mostSignificantBit(x);
         assertEq(i, mostSignificantBit(x));
     }
     // (runs: 256, μ: 18301, ~: 10819)
