@@ -67,7 +67,10 @@ forge remove solmate
 npm i @openzeppelin/contracts
 ```
 - test multisig?
-- mainnet fork
+- [ ] mainnet fork
+```shell
+forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
+```
 - crosschain fork
 - [ ] fuzzing
 - invariant
