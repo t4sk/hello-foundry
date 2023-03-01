@@ -57,6 +57,7 @@ forge test --match-path test/Console.t.sol -vv
   - [ ] deal, hoax
 - [ ] signature
 - cheatcode
+  - env
 - [ ] remapping
 ```shell
 forge remappings
@@ -71,7 +72,8 @@ npm i @openzeppelin/contracts
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
-- crosschain fork
+- [ ] crosschain fork
+  - token bridge
 - [ ] fuzzing
 - invariant
 - differential testing
