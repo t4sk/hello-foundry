@@ -12,7 +12,7 @@ contract WETH9InvariantTests is Test, InvariantTest {
     function setUp() public {
         weth = new WETH9();
     }
-    
+
     // TODO: conditional invariant
     // TODO: invariant target
     // TODO: - open testing

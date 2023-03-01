@@ -5,15 +5,18 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 interface IWETH {
-    function balanceOf(address) external view returns (uint);
+    function balanceOf(address) external view returns (uint256);
     function deposit() external payable;
 }
 
-contract ForkTest is Test {
+// TODO: fix
+// RUST_LOG=error,debug forge test --match-path test/CrossChainFork.t.sol
+
+contract CrossChainTest is Test {
     // fork ids
-    uint mainnet;
-    uint opt;
-    uint arb;
+    uint256 mainnet;
+    uint256 opt;
+    uint256 arb;
 
     function setUp() public {
         string memory MAINNET_FORK_URL = vm.envString("MAINNET_FORK_URL");

@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 interface IWETH {
-    function balanceOf(address) external view returns (uint);
+    function balanceOf(address) external view returns (uint256);
     function deposit() external payable;
 }
 
@@ -17,12 +17,12 @@ contract ForkTest is Test {
     }
 
     function testInc() public {
-        uint balBefore = weth.balanceOf(address(this));
+        uint256 balBefore = weth.balanceOf(address(this));
         console.log("balance before", balBefore);
 
         weth.deposit{value: 100}();
 
-        uint balAfter = weth.balanceOf(address(this));
+        uint256 balAfter = weth.balanceOf(address(this));
         console.log("balance after", balAfter);
     }
 }
