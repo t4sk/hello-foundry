@@ -72,19 +72,23 @@ npm i @openzeppelin/contracts
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
+# TODO: not working right now
 - [ ] crosschain fork
   - token bridge
-- [ ] fuzzing
-- invariant
+
+- [ ] fuzzing (assume, bound)
+- [ ] invariant (TODO)
 - differential testing
 
-- formatter
-- chisel
+- [ ] formatter
+```shell
+forge fmt
+```
 - debugger
 
 # TODO:
 
 - [ ] std storage
-- tutorials
-- refs
 - vyper?
+
+- chisel
