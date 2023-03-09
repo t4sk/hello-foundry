@@ -2,16 +2,19 @@
 pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
+import "forge-std/console.sol";
 import "forge-std/InvariantTest.sol";
 import {WETH9} from "../src/WETH9.sol";
 
+// https://mirror.xyz/horsefacts.eth/Jex2YVaO65dda6zEyfM_-DXlXhOWCAoSpOx5PLocYgw
+
 // TODO: test english auction?
 // TODO: conditional invariant
-// TODO: invariant target
-// TODO: [x] ghost variables
+// invariant target
+// ghost variables
 // TODO: - function level assertions
 // TODO: - bound
-// TODO: - actor management
+// actor management
 // TODO: target selectors
 
 
@@ -84,5 +87,67 @@ contract WETH9_Handler_Based_Invariant_Tests is Test, InvariantTest {
 
     function invariant_eth_balance() public {
         assertGe(address(weth).balance, handler.wethBalance());
+    }
+}
+
+contract ActorManager is CommonBase, StdCheats, StdUtils {
+    Handler[] public handlers;
+
+    constructor(Handler[] memory _handlers) {
+        handlers = _handlers;
+    }
+
+    function sendToFallback(uint handlerIndex, uint amount) public {
+        handlers[bound(handlerIndex, 0, handlers.length - 1)].sendToFallback(amount);
+    }
+
+    function deposit(uint handlerIndex, uint amount) public {
+        handlers[bound(handlerIndex, 0, handlers.length - 1)].deposit(amount);
+    }
+
+    function withdraw(uint handlerIndex, uint amount) public {
+        handlers[bound(handlerIndex, 0, handlers.length - 1)].withdraw(amount);
+    }
+}
+
+contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
+    WETH9 public weth;
+    ActorManager public manager;
+    Handler[] public handlers;
+
+    uint private constant ETH_SUPPLY = 10 ether;
+
+    function setUp() public {
+        weth = new WETH9();
+
+        for (uint i = 0; i < 3; i++) {
+            handlers.push(new Handler(weth));
+            // Send 10 ETH to handler
+            deal(address(handlers[i]), ETH_SUPPLY);
+        }
+
+        manager = new ActorManager(handlers);
+
+        // TODO:
+        bytes4[] memory selectors = new bytes4[](3);
+        selectors[0] = Handler.deposit.selector;
+        selectors[1] = Handler.withdraw.selector;
+        selectors[2] = Handler.sendFallback.selector;
+
+        targetSelector(FuzzSelector({
+            addr: address(handler),
+            selectors: selectors
+        }));
+
+        targetContract(address(manager));
+    }
+
+    function invariant_eth_balance() public {
+        uint total = 0;
+        for (uint i = 0; i < handlers.length; i++) {
+            total += handlers[i].wethBalance();
+        }
+        console.log("ETH total", total);
+        assertGe(address(weth).balance, total);
     }
 }
