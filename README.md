@@ -77,7 +77,8 @@ forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
   - token bridge
 
 - [ ] fuzzing (assume, bound)
-- [ ] invariant (TODO)
+- [ ] invariant
+- [] ffi
 - differential testing
 
 - [ ] formatter

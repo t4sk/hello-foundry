@@ -130,12 +130,12 @@ contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
 
         // TODO:
         bytes4[] memory selectors = new bytes4[](3);
-        selectors[0] = Handler.deposit.selector;
-        selectors[1] = Handler.withdraw.selector;
-        selectors[2] = Handler.sendFallback.selector;
+        selectors[0] = ActorManager.deposit.selector;
+        selectors[1] = ActorManager.withdraw.selector;
+        selectors[2] = ActorManager.sendToFallback.selector;
 
         targetSelector(FuzzSelector({
-            addr: address(handler),
+            addr: address(manager),
             selectors: selectors
         }));
 
