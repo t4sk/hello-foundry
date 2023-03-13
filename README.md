@@ -81,6 +81,15 @@ forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 - [] ffi
 - differential testing
 
+```shell
+# virtual env
+python3 -m pip install --user virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+
+pip install eth-abi
+```
+
 - [ ] formatter
 ```shell
 forge fmt

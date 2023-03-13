@@ -1,15 +1,13 @@
 import sys
 import math
+from eth_abi import encode
 
-def encode_to_hex(y):
-    h = (("0" * 64) + hex(y)[2:])[-64:]
-    return f"0x{h}"
-
-# print(sys.argv)
-
-x = float(sys.argv[1])
+x = float(sys.argv[1]) / 2**64
 y = math.exp(x)
 
-y = encode_to_hex(int(y))
+assert y < 2**64, f"x = {x}"
+y = int(y * 2**64)
+
+y = "0x" + encode(["int128"], [y]).hex()
 print(y)
 
