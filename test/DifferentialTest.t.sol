@@ -29,8 +29,8 @@ contract DifferentialTest is Test {
     }
 
     function test_exp(int128 x) public {
-        vm.assume(x >= 2**64);
-        vm.assume(x <= 20 * 2**64);
+        vm.assume(x >= 2 ** 64);
+        vm.assume(x <= 20 * 2 ** 64);
 
         // 1 = 2**64
         // int128 x = 3 * 2**64
@@ -39,9 +39,9 @@ contract DifferentialTest is Test {
 
         assertGe(y1, 0);
 
-        console.log("y", uint256(int256(y0 / 2**64)), uint256(int256(y1 / 2**64)));
+        console.log("y", uint256(int256(y0 / 2 ** 64)), uint256(int256(y1 / 2 ** 64)));
 
-        uint DELTA = 2**64;
+        uint256 DELTA = 2 ** 64;
         assertApproxEqAbs(uint256(int256(y0)), uint256(int256(y1)), DELTA);
     }
 }
