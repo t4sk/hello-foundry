@@ -17,7 +17,6 @@ import {WETH9} from "../src/WETH9.sol";
 // actor management
 // TODO: target selectors
 
-
 contract WETH9_Open_Invariant_Tests is Test, InvariantTest {
     WETH9 public weth;
 
@@ -40,7 +39,7 @@ import {StdUtils} from "forge-std/StdUtils.sol";
 
 contract Handler is CommonBase, StdCheats, StdUtils {
     WETH9 private weth;
-    uint public wethBalance;
+    uint256 public wethBalance;
 
     constructor(WETH9 _weth) {
         weth = _weth;
@@ -51,18 +50,18 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     function sendToFallback(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
         wethBalance += amount;
-        (bool ok,) = address(weth).call{ value: amount }("");
+        (bool ok,) = address(weth).call{value: amount}("");
         require(ok, "sendToFallback failed");
     }
 
-    function deposit(uint amount) public {
-        // bound amount 
+    function deposit(uint256 amount) public {
+        // bound amount
         bound(amount, 0, address(this).balance);
         wethBalance += amount;
         weth.deposit{value: amount}();
     }
 
-    function withdraw(uint amount) public {
+    function withdraw(uint256 amount) public {
         bound(amount, 0, weth.balanceOf(address(this)));
         wethBalance -= amount;
         weth.withdraw(amount);
@@ -73,7 +72,7 @@ contract WETH9_Handler_Based_Invariant_Tests is Test, InvariantTest {
     WETH9 public weth;
     Handler public handler;
 
-    uint private constant ETH_SUPPLY = 10 ether;
+    uint256 private constant ETH_SUPPLY = 10 ether;
 
     function setUp() public {
         weth = new WETH9();
@@ -97,15 +96,15 @@ contract ActorManager is CommonBase, StdCheats, StdUtils {
         handlers = _handlers;
     }
 
-    function sendToFallback(uint handlerIndex, uint amount) public {
+    function sendToFallback(uint256 handlerIndex, uint256 amount) public {
         handlers[bound(handlerIndex, 0, handlers.length - 1)].sendToFallback(amount);
     }
 
-    function deposit(uint handlerIndex, uint amount) public {
+    function deposit(uint256 handlerIndex, uint256 amount) public {
         handlers[bound(handlerIndex, 0, handlers.length - 1)].deposit(amount);
     }
 
-    function withdraw(uint handlerIndex, uint amount) public {
+    function withdraw(uint256 handlerIndex, uint256 amount) public {
         handlers[bound(handlerIndex, 0, handlers.length - 1)].withdraw(amount);
     }
 }
@@ -115,12 +114,12 @@ contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
     ActorManager public manager;
     Handler[] public handlers;
 
-    uint private constant ETH_SUPPLY = 10 ether;
+    uint256 private constant ETH_SUPPLY = 10 ether;
 
     function setUp() public {
         weth = new WETH9();
 
-        for (uint i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; i++) {
             handlers.push(new Handler(weth));
             // Send 10 ETH to handler
             deal(address(handlers[i]), ETH_SUPPLY);
@@ -134,17 +133,14 @@ contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
         selectors[1] = ActorManager.withdraw.selector;
         selectors[2] = ActorManager.sendToFallback.selector;
 
-        targetSelector(FuzzSelector({
-            addr: address(manager),
-            selectors: selectors
-        }));
+        targetSelector(FuzzSelector({addr: address(manager), selectors: selectors}));
 
         targetContract(address(manager));
     }
 
     function invariant_eth_balance() public {
-        uint total = 0;
-        for (uint i = 0; i < handlers.length; i++) {
+        uint256 total = 0;
+        for (uint256 i = 0; i < handlers.length; i++) {
             total += handlers[i].wethBalance();
         }
         console.log("ETH total", total);
