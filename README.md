@@ -1,6 +1,10 @@
 # hello-foundry
 
+https://github.com/foundry-rs/foundry
+
 https://book.getfoundry.sh/
+
+### Basic
 
 -   [ ] Install
 
@@ -71,6 +75,8 @@ forge snapshot
 forge test --match-path test/Console.t.sol -vv
 ```
 
+### Intermediate
+
 ---
 
 -   [ ] Test auth
@@ -85,12 +91,14 @@ forge test --match-path test/Console.t.sol -vv
 
     -   env
 
--   TODO: test multisig?
+-   TODO: test eth wallet, multisig, auction?
 -   [ ] mainnet fork
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
+
+### Advanced
 
 # TODO: not working right now
 
@@ -114,6 +122,7 @@ pip install eth-abi
 
 # TODO:
 
+-   [ ] Check foundry book
 -   [ ] std storage
 -   [ ] vyper?
 -   forge geiger
