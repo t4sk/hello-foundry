@@ -6,59 +6,60 @@ npm i
 
 https://book.getfoundry.sh/
 
-- [ ] install
+-   [ ] install
 
 ```shell
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
-- [ ] init
+-   [ ] init
 
 ```shell
 forge init
 ```
 
-- [ ] basic commands - compile and test
-- [ ] solc version and optimizer settings
-- hello world
-  - [ ] fmt
-  - [ ] test
+-   [ ] basic commands - compile and test
+-   [ ] solc version and optimizer settings
+-   hello world
+    -   [ ] fmt
+    -   [ ] test
 
 ```shell
 forge fmt
 forge test --match-path test/HelloWorld -vvvv
 ```
 
-- test (match, test ok, fail, verbose, gas report)
+-   test (match, test ok, fail, verbose, gas report)
 
-  - counter app
-  - match
-  - test ok, failure
-  - verbose
-  - gas report
+    -   counter app
+    -   match
+    -   test ok, failure
+    -   verbose
+    -   gas report
 
 ```shell
 forge test --match-path test/Counter.t.sol -vvv --gas-report
 ```
 
-- console
+-   console
 
 ```shell
 forge test --match-path test/Console.t.sol -vv
 ```
 
-- [ ] auth
-- [ ] event (expectEmit)
-- [ ] test error (expectRevert)
-- [ ] time
-- [ ] test label for error
-- [ ] send eth
-  - [ ] deal, hoax
-- [ ] signature
-- cheatcode
-  - env
-- [ ] remapping
+-   [ ] auth
+-   [ ] event (expectEmit)
+-   [ ] test error (expectRevert)
+-   [ ] time
+-   [ ] test label for error
+-   [ ] send eth
+    -   [ ] deal, hoax
+-   [ ] signature
+-   cheatcode
+    -   env
+-   [ ] remapping
+
 ```shell
 forge remappings
 forge install rari-capital/solmate
@@ -67,19 +68,24 @@ forge remove solmate
 
 npm i @openzeppelin/contracts
 ```
-- test multisig?
-- [ ] mainnet fork
+
+-   test multisig?
+-   [ ] mainnet fork
+
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
-# TODO: not working right now
-- [ ] crosschain fork
-  - token bridge
 
-- [ ] fuzzing (assume, bound)
-- [ ] invariant
-- [] ffi
-- differential testing
+# TODO: not working right now
+
+-   [ ] crosschain fork
+
+    -   token bridge
+
+-   [ ] fuzzing (assume, bound)
+-   [ ] invariant
+-   [] ffi
+-   differential testing
 
 ```shell
 # virtual env
@@ -90,16 +96,16 @@ source venv/bin/activate
 pip install eth-abi
 ```
 
-- [ ] formatter
+-   [ ] formatter
 
 ```shell
 forge fmt
 ```
-- debugger
 
 # TODO:
 
-- [ ] std storage
-- vyper?
+-   [ ] std storage
+-   [ ] vyper?
 
-- chisel
+-   chisel?
+-   debugger?
