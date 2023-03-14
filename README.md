@@ -1,64 +1,35 @@
 # hello-foundry
 
-```shell
-npm i
-```
-
 https://book.getfoundry.sh/
 
--   [ ] install
+-   [ ] Install
 
 ```shell
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
--   [ ] init
+-   [ ] Init
 
 ```shell
 forge init
 ```
 
--   [ ] basic commands - compile and test
--   [ ] solc version and optimizer settings
--   hello world
-    -   [ ] fmt
-    -   [ ] test
+-   [ ] Basic commands
 
 ```shell
-forge fmt
+forge build
+forge test
 forge test --match-path test/HelloWorld -vvvv
 ```
 
--   test (match, test ok, fail, verbose, gas report)
+---
 
-    -   counter app
-    -   match
-    -   test ok, failure
-    -   verbose
-    -   gas report
+-   [ ] Solidity version and optimizer settings
 
-```shell
-forge test --match-path test/Counter.t.sol -vvv --gas-report
-```
+---
 
--   console
-
-```shell
-forge test --match-path test/Console.t.sol -vv
-```
-
--   [ ] auth
--   [ ] event (expectEmit)
--   [ ] test error (expectRevert)
--   [ ] time
--   [ ] test label for error
--   [ ] send eth
-    -   [ ] deal, hoax
--   [ ] signature
--   cheatcode
-    -   env
--   [ ] remapping
+-   [ ] Remapping
 
 ```shell
 forge remappings
@@ -69,7 +40,52 @@ forge remove solmate
 npm i @openzeppelin/contracts
 ```
 
--   test multisig?
+---
+
+-   [ ] Formatter
+
+```shell
+forge fmt
+```
+
+---
+
+-   [ ] Test (match, test ok, test fail, verbose, gas report)
+
+    -   counter app
+    -   match
+    -   test ok, failure
+    -   verbose
+    -   gas report
+
+```shell
+forge test --match-path test/Counter.t.sol -vvv --gas-report
+forge snapshot
+```
+
+---
+
+-   [ ] console
+
+```shell
+forge test --match-path test/Console.t.sol -vv
+```
+
+---
+
+-   [ ] Test auth
+-   [ ] Test event (expectEmit)
+-   [ ] Test error (expectRevert)
+-   [ ] Test time
+-   [ ] Test label for error
+-   [ ] Test send eth
+    -   [ ] deal, hoax
+-   [ ] Test signature
+-   [ ] Cheatcode
+
+    -   env
+
+-   TODO: test multisig?
 -   [ ] mainnet fork
 
 ```shell
@@ -82,10 +98,10 @@ forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 
     -   token bridge
 
--   [ ] fuzzing (assume, bound)
--   [ ] invariant
--   [] ffi
--   differential testing
+-   [ ] Fuzzing (assume, bound)
+-   [ ] Invariant
+-   [ ] FFI
+-   [ ] Differential testing
 
 ```shell
 # virtual env
@@ -96,16 +112,11 @@ source venv/bin/activate
 pip install eth-abi
 ```
 
--   [ ] formatter
-
-```shell
-forge fmt
-```
-
 # TODO:
 
 -   [ ] std storage
 -   [ ] vyper?
+-   forge geiger
 
 -   chisel?
 -   debugger?
