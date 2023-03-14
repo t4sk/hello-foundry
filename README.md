@@ -124,7 +124,7 @@ pip install eth-abi
 
 -   forge geiger
 
--   [ ] vyper
+-   [ ] Vyper
 
 https://github.com/0xKitsune/Foundry-Vyper
 
