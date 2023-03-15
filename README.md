@@ -82,12 +82,12 @@ forge test --match-path test/Console.t.sol -vv
 -   [ ] Test auth
 -   [ ] Test event (expectEmit)
 -   [ ] Test error (expectRevert)
--   [ ] Test time
+-   [ ] Test time (`Auction.sol`)
 -   [ ] Test label for error
 -   [ ] Test send eth (`Wallet.sol`)
     -   [ ] hoax, deal
 -   [ ] Test signature
--   [ ] Cheatcode
+-   [ ] TODO: Cheatcode
 
     -   env
 
