@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "forge-std/Test.sol";
 import {Auth} from "../src/Auth.sol";
 
-//forge test --match-path test/Auth.t.sol -vvvv
+// forge test --match-path test/Auth.t.sol -vvvv
 
 contract AuthTest is Test {
     Auth public auth;

@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 contract Wallet {
     address payable public owner;
 
-    constructor() {
+    constructor() payable {
         owner = payable(msg.sender);
     }
 
@@ -12,9 +12,5 @@ contract Wallet {
     function withdraw(uint256 _amount) external {
         require(msg.sender == owner, "caller is not owner");
         payable(msg.sender).transfer(_amount);
-    }
-
-    function getBalance() external view returns (uint256) {
-        return address(this).balance;
     }
 }

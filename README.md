@@ -84,14 +84,14 @@ forge test --match-path test/Console.t.sol -vv
 -   [ ] Test error (expectRevert)
 -   [ ] Test time
 -   [ ] Test label for error
--   [ ] Test send eth
-    -   [ ] deal, hoax
+-   [ ] Test send eth (`Wallet.sol`)
+    -   [ ] hoax, deal
 -   [ ] Test signature
 -   [ ] Cheatcode
 
     -   env
 
--   TODO: test eth wallet, multisig, auction?
+-   TODO: test multisig, auction?
 -   [ ] mainnet fork
 
 ```shell
