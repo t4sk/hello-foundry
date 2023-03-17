@@ -6,25 +6,40 @@ https://book.getfoundry.sh/
 
 ## Basic
 
--   [ ] Install
+-   [x] Install
 
 ```shell
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
--   [ ] Init
+-   [x] Init
 
 ```shell
 forge init
 ```
 
--   [ ] Basic commands
+-   [x] Basic commands
 
 ```shell
 forge build
 forge test
 forge test --match-path test/HelloWorld -vvvv
+```
+
+---
+
+-   [ ] Test (match, test ok, test fail, verbose, gas report)
+
+    -   counter app
+    -   match
+    -   test ok, failure
+    -   verbose
+    -   gas report
+
+```shell
+forge test --match-path test/Counter.t.sol -vvv --gas-report
+forge snapshot
 ```
 
 ---
@@ -54,19 +69,6 @@ forge fmt
 
 ---
 
--   [ ] Test (match, test ok, test fail, verbose, gas report)
-
-    -   counter app
-    -   match
-    -   test ok, failure
-    -   verbose
-    -   gas report
-
-```shell
-forge test --match-path test/Counter.t.sol -vvv --gas-report
-forge snapshot
-```
-
 ---
 
 -   [ ] console
@@ -82,7 +84,7 @@ forge test --match-path test/Console.t.sol -vv
 -   [ ] Test auth
 -   [ ] Test event (expectEmit)
 -   [ ] Test error (expectRevert)
--   [ ] Test time (`Auction.sol`)
+-   [ ] TODO: Test time (`Auction.sol`)
 -   [ ] Test label for error
 -   [ ] Test send eth (`Wallet.sol`)
     -   [ ] hoax, deal
