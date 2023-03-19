@@ -29,17 +29,15 @@ forge test --match-path test/HelloWorld -vvvv
 
 ---
 
--   [ ] Test (match, test ok, test fail, verbose, gas report)
-
+-   [ ] Test
     -   counter app
+    -   test setup, ok, fail
     -   match
-    -   test ok, failure
     -   verbose
     -   gas report
 
 ```shell
 forge test --match-path test/Counter.t.sol -vvv --gas-report
-forge snapshot
 ```
 
 ---
@@ -157,3 +155,4 @@ forge test --match-path test/Vyper.t.sol --ffi
 
 -   chisel?
 -   debugger?
+-   forge snapshot?

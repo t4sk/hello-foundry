@@ -7,18 +7,20 @@ import {Counter} from "../src/Counter.sol";
 contract CounterTest is Test {
     Counter public counter;
 
-    // invoked before each test
+    // Invoked before each test
     function setUp() public {
         counter = new Counter();
     }
 
-    // test must be external or public
+    // Test must be external or public
     function testInc() public {
         counter.inc();
         assertEq(counter.count(), 1);
     }
 
     function testFailDec() public {
+        // This will fail with underflow
+        // count = 0 --> count -= 1
         counter.dec();
     }
 
