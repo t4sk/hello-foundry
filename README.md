@@ -29,7 +29,7 @@ forge test --match-path test/HelloWorld -vvvv
 
 ---
 
--   [ ] Test
+-   [x] Test
     -   counter app
     -   test setup, ok, fail
     -   match
@@ -43,6 +43,8 @@ forge test --match-path test/Counter.t.sol -vvv --gas-report
 ---
 
 -   [ ] Solidity version and optimizer settings
+
+https://github.com/foundry-rs/foundry/tree/master/config
 
 ---
 
