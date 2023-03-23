@@ -75,6 +75,7 @@ forge fmt
 
 ```shell
 forge test --match-path test/Console.t.sol -vv
+forge geiger
 ```
 
 ## Intermediate
@@ -151,6 +152,12 @@ vyper --version
 
 ```shell
 forge test --match-path test/Vyper.t.sol --ffi
+```
+
+-   [ ] ignore error code
+
+```
+ignored_error_codes = ["license", "unused-param", "unused-var"]
 ```
 
 # TODO:
