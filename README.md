@@ -42,7 +42,7 @@ forge test --match-path test/Counter.t.sol -vvv --gas-report
 
 ---
 
--   [ ] Solidity version and optimizer settings
+-   [x] Solidity version and optimizer settings
 
 https://github.com/foundry-rs/foundry/tree/master/config
 
