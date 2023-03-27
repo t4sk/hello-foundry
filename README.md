@@ -61,7 +61,7 @@ npm i @openzeppelin/contracts
 
 ---
 
--   [ ] Formatter
+-   [x] Formatter
 
 ```shell
 forge fmt
@@ -149,6 +149,12 @@ vyper --version
 2. Declare Solidity interface inside `src`
 3. Copy & paste `lib/utils/VyperDeployer.sol`
 4. Write test
+
+-   [ ] print vyper
+
+```
+print("HERE", convert(123, uint256), hardhat_compat=True)
+```
 
 ```shell
 forge test --match-path test/Vyper.t.sol --ffi
