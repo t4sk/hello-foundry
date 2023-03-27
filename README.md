@@ -48,7 +48,7 @@ https://github.com/foundry-rs/foundry/tree/master/config
 
 ---
 
--   [ ] Remapping
+-   [x] Remapping
 
 ```shell
 forge remappings
