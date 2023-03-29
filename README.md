@@ -71,11 +71,10 @@ forge fmt
 
 ---
 
--   [ ] console
+-   [ ] console (Counter, test, log int)
 
 ```shell
 forge test --match-path test/Console.t.sol -vv
-forge geiger
 ```
 
 ## Intermediate
@@ -164,6 +163,12 @@ forge test --match-path test/Vyper.t.sol --ffi
 
 ```
 ignored_error_codes = ["license", "unused-param", "unused-var"]
+```
+
+-   [ ] Forge geiger
+
+```shell
+forge geiger
 ```
 
 # TODO:
