@@ -13,4 +13,9 @@ contract Wallet {
         require(msg.sender == owner, "caller is not owner");
         payable(msg.sender).transfer(_amount);
     }
+
+    function setOwner(address _owner) external {
+        require(msg.sender == owner, "caller is not owner");
+        owner = payable(_owner);
+    }
 }
