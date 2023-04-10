@@ -4,11 +4,11 @@ pragma solidity ^0.8.18;
 contract Error {
     error NotAuthorized();
 
-    function testRequire() external {
+    function throwError() external {
         require(false, "not authorized");
     }
 
-    function testCustomError() external {
+    function throwCustomError() external {
         revert NotAuthorized();
     }
 }

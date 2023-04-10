@@ -12,22 +12,22 @@ contract ErrorTest is Test {
     }
 
     function testFail() public {
-        err.testRequire();
+        err.throwError();
     }
 
     function testRevert() public {
         vm.expectRevert();
-        err.testRequire();
+        err.throwError();
     }
 
     function testRequireMessage() public {
         vm.expectRevert(bytes("not authorized"));
-        err.testRequire();
+        err.throwError();
     }
 
     function testCustomError() public {
         vm.expectRevert(Error.NotAuthorized.selector);
-        err.testCustomError();
+        err.throwCustomError();
     }
 
     // Add label to assertions

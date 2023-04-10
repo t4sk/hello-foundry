@@ -71,7 +71,7 @@ forge fmt
 
 ---
 
--   [ ] console (Counter, test, log int)
+-   [x] console (Counter, test, log int)
 
 ```shell
 forge test --match-path test/Console.t.sol -vv
@@ -81,11 +81,14 @@ forge test --match-path test/Console.t.sol -vv
 
 ---
 
--   [ ] Test auth
+-   [x] Test auth
+-   [ ] Test error
+    -   `expectRevert`
+    -   `require` error message
+    -   custom error
+    -   label assertions
 -   [ ] Test event (expectEmit)
--   [ ] Test error (expectRevert)
 -   [ ] TODO: Test time (`Auction.sol`)
--   [ ] Test label for error
 -   [ ] Test send eth (`Wallet.sol`)
     -   [ ] hoax, deal
 -   [ ] Test signature
