@@ -83,7 +83,7 @@ forge test --match-path test/Console.t.sol -vv
 
 -   [x] Test auth
 -   [ ] Test error
-    -   `expectRevert`
+    -   `vm.expectRevert`
     -   `require` error message
     -   custom error
     -   label assertions
