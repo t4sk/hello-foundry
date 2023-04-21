@@ -16,17 +16,26 @@ contract EventTest is Test {
     }
 
     function testEmitTransferEvent() public {
-        // function expectEmit(bool checkTopic1, bool checkTopic2, bool checkTopic3, bool checkData) external;
-        // check index 1, index 2 and data
+        // function expectEmit(
+        //     bool checkTopic1,
+        //     bool checkTopic2,
+        //     bool checkTopic3,
+        //     bool checkData
+        // ) external;
+
+        // 1. Tell Foundry which data to check
+        // Check index 1, index 2 and data
         vm.expectEmit(true, true, false, true);
+        // 2. Emit the expected event
         emit Transfer(address(this), address(123), 456);
+        // 3. Call the function that should emit the event
         e.transfer(address(this), address(123), 456);
 
-        // check only index 1
+        // Check only index 1
         vm.expectEmit(true, false, false, false);
         emit Transfer(address(this), address(123), 456);
-        // index 2 and data (amount) doesn't match
-        // but the test will still pass
+        // NOTE: index 2 and data (amount) doesn't match
+        //       but the test will still pass
         e.transfer(address(this), address(111), 222);
     }
 
@@ -40,10 +49,13 @@ contract EventTest is Test {
         amounts[1] = 2;
 
         for (uint256 i = 0; i < to.length; i++) {
+            // 1. Tell Foundry which data to check
             vm.expectEmit(true, true, false, true);
+            // 2. Emit the expected event
             emit Transfer(address(this), to[i], amounts[i]);
         }
 
+        // 3. Call the function that should emit the event
         e.transferMany(address(this), to, amounts);
     }
 }
