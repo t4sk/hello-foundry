@@ -87,7 +87,7 @@ forge test --match-path test/Console.t.sol -vv
     -   `require` error message
     -   custom error
     -   label assertions
--   [ ] Test event (expectEmit)
+-   [x] Test event (expectEmit)
 -   [ ] TODO: Test time (`Auction.sol`)
 -   [ ] Test send eth (`Wallet.sol`)
     -   [ ] hoax, deal
@@ -97,13 +97,14 @@ forge test --match-path test/Console.t.sol -vv
     -   env
 
 -   TODO: test multisig, auction?
+
+## Advanced
+
 -   [ ] mainnet fork
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
-
-## Advanced
 
 TODO: not working right now
 
@@ -179,3 +180,4 @@ forge geiger
 -   chisel?
 -   debugger?
 -   forge snapshot?
+-   script?
