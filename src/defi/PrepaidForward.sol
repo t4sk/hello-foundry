@@ -9,6 +9,21 @@ import "../interfaces/IERC20.sol";
 
 // Prepaid forward contract - strike price is paid at the initiation
 
+enum Status {
+    Null,
+    Open,
+    Entered
+}
+
+struct Forward {
+    address buyer;
+    address seller;
+    uint256 quantity;
+    uint256 strike;
+    uint256 maturity;
+    Status status;
+}
+
 contract PrepaidForward {
     // long position - buyer
     // short position - seller
@@ -36,7 +51,7 @@ contract PrepaidForward {
     //    K = S(t0) / Z(t0, T) * Z(t0, T) = S(t0)
 
     event ForwardCreated(
-        uint256 id, address indexed seller, uint256 quantity, uint256 strikePrice, uint256 maturityDate
+        uint256 id, address indexed seller, uint256 quantity, uint256 strike, uint256 maturity
     );
     event ForwardCanceled(uint256 id);
     event ForwardEntered(uint256 id, address indexed buyer);
@@ -47,30 +62,20 @@ contract PrepaidForward {
     // For example, USDC
     IERC20 public immutable payToken;
 
-    enum Status {
-        Open,
-        Entered
-    }
-
-    struct Forward {
-        address buyer;
-        address seller;
-        uint256 quantity;
-        uint256 strikePrice;
-        uint256 maturityDate;
-        Status status;
-    }
-
     uint256 private forwardId;
-    mapping(uint256 => Forward) public forwards;
+    mapping(uint256 => Forward) private forwards;
 
     constructor(IERC20 _underlying, IERC20 _pay) {
         underlyingAsset = _underlying;
         payToken = _pay;
     }
 
-    function write(uint256 _quantity, uint256 _strikePrice, uint256 _maturityDate) external returns (uint256) {
-        require(_maturityDate > block.timestamp, "maturity must be > now");
+    function get(uint id) external view returns (Forward memory) {
+        return forwards[id];
+    }
+
+    function write(uint256 _quantity, uint256 _strike, uint256 _maturity) external returns (uint256) {
+        require(_maturity > block.timestamp, "maturity must be > now");
 
         uint256 id = forwardId + 1;
         forwardId = id;
@@ -79,12 +84,12 @@ contract PrepaidForward {
             buyer: address(0),
             seller: msg.sender,
             quantity: _quantity,
-            strikePrice: _strikePrice,
-            maturityDate: _maturityDate,
+            strike: _strike,
+            maturity: _maturity,
             status: Status.Open
         });
 
-        emit ForwardCreated(id, msg.sender, _quantity, _strikePrice, _maturityDate);
+        emit ForwardCreated(id, msg.sender, _quantity, _strike, _maturity);
 
         return id;
     }
@@ -104,14 +109,14 @@ contract PrepaidForward {
     function enter(uint256 _id) external {
         Forward storage forward = forwards[_id];
 
-        require(block.timestamp < forward.maturityDate, "expired");
+        require(block.timestamp < forward.maturity, "expired");
         require(forward.status == Status.Open, "forward already entered");
 
         forward.status = Status.Entered;
         forward.buyer = msg.sender;
 
         underlyingAsset.transferFrom(forward.seller, address(this), forward.quantity);
-        payToken.transferFrom(msg.sender, address(this), forward.strikePrice);
+        payToken.transferFrom(msg.sender, address(this), forward.strike);
 
         emit ForwardEntered(_id, msg.sender);
     }
@@ -122,10 +127,10 @@ contract PrepaidForward {
         require(msg.sender == forward.seller || msg.sender == forward.buyer, "not authorized");
         // Check forward is entered and not deleted
         require(forward.status == Status.Entered, "forward not entered");
-        require(forward.maturityDate <= block.timestamp, "not expired");
+        require(forward.maturity <= block.timestamp, "not expired");
 
         underlyingAsset.transfer(forward.buyer, forward.quantity);
-        payToken.transfer(forward.seller, forward.strikePrice);
+        payToken.transfer(forward.seller, forward.strike);
 
         delete forwards[_id];
 
