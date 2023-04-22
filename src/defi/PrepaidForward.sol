@@ -53,7 +53,14 @@ contract PrepaidForward {
     uint256 public immutable maturity;
     Status public status;
 
-    constructor(IERC20 _underlying, IERC20 _pay, address _seller, uint256 _quantity, uint256 _strike, uint256 _maturity) {
+    constructor(
+        IERC20 _underlying,
+        IERC20 _pay,
+        address _seller,
+        uint256 _quantity,
+        uint256 _strike,
+        uint256 _maturity
+    ) {
         underlyingAsset = _underlying;
         payToken = _pay;
 
@@ -65,6 +72,7 @@ contract PrepaidForward {
         maturity = _maturity;
     }
 
+    // NOTE: enter should be called immediately after the contract is deployed
     function enter() external {
         require(block.timestamp < maturity, "expired");
         require(status == Status.Open, "not open");
