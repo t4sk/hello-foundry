@@ -10,18 +10,9 @@ import "../interfaces/IERC20.sol";
 // Prepaid forward contract - strike price is paid at the initiation
 
 enum Status {
-    Null,
     Open,
-    Entered
-}
-
-struct Forward {
-    address buyer;
-    address seller;
-    uint256 quantity;
-    uint256 strike;
-    uint256 maturity;
-    Status status;
+    Entered,
+    Settled
 }
 
 contract PrepaidForward {
@@ -50,90 +41,48 @@ contract PrepaidForward {
     // For prepaid forward contract
     //    K = S(t0) / Z(t0, T) * Z(t0, T) = S(t0)
 
-    event ForwardCreated(
-        uint256 id, address indexed seller, uint256 quantity, uint256 strike, uint256 maturity
-    );
-    event ForwardCanceled(uint256 id);
-    event ForwardEntered(uint256 id, address indexed buyer);
-    event ForwardSettled(uint256 id);
-
     // For example, WETH
     IERC20 public immutable underlyingAsset;
     // For example, USDC
     IERC20 public immutable payToken;
 
-    uint256 private forwardId;
-    mapping(uint256 => Forward) private forwards;
+    address public buyer;
+    address public immutable seller;
+    uint256 public immutable quantity;
+    uint256 public immutable strike;
+    uint256 public immutable maturity;
+    Status public status;
 
-    constructor(IERC20 _underlying, IERC20 _pay) {
+    constructor(IERC20 _underlying, IERC20 _pay, address _seller, uint256 _quantity, uint256 _strike, uint256 _maturity) {
         underlyingAsset = _underlying;
         payToken = _pay;
+
+        require(block.timestamp < _maturity, "maturity must be > now");
+
+        seller = _seller;
+        quantity = _quantity;
+        strike = _strike;
+        maturity = _maturity;
     }
 
-    function get(uint id) external view returns (Forward memory) {
-        return forwards[id];
+    function enter() external {
+        require(block.timestamp < maturity, "expired");
+        require(status == Status.Open, "not open");
+
+        status = Status.Entered;
+        buyer = msg.sender;
+
+        underlyingAsset.transferFrom(seller, address(this), quantity);
+        payToken.transferFrom(msg.sender, address(this), strike);
     }
 
-    function write(uint256 _quantity, uint256 _strike, uint256 _maturity) external returns (uint256) {
-        require(_maturity > block.timestamp, "maturity must be > now");
+    function settle() external {
+        require(block.timestamp >= maturity, "not matured");
+        require(status == Status.Entered, "not entered");
 
-        uint256 id = forwardId + 1;
-        forwardId = id;
+        status = Status.Settled;
 
-        forwards[id] = Forward({
-            buyer: address(0),
-            seller: msg.sender,
-            quantity: _quantity,
-            strike: _strike,
-            maturity: _maturity,
-            status: Status.Open
-        });
-
-        emit ForwardCreated(id, msg.sender, _quantity, _strike, _maturity);
-
-        return id;
-    }
-
-    function cancel(uint256 _id) external {
-        Forward storage forward = forwards[_id];
-
-        // Also checks that forward exists
-        require(msg.sender == forward.seller, "not authorized");
-        require(forward.status == Status.Open, "not open");
-
-        delete forwards[_id];
-
-        emit ForwardCanceled(_id);
-    }
-
-    function enter(uint256 _id) external {
-        Forward storage forward = forwards[_id];
-
-        require(block.timestamp < forward.maturity, "expired");
-        require(forward.status == Status.Open, "forward already entered");
-
-        forward.status = Status.Entered;
-        forward.buyer = msg.sender;
-
-        underlyingAsset.transferFrom(forward.seller, address(this), forward.quantity);
-        payToken.transferFrom(msg.sender, address(this), forward.strike);
-
-        emit ForwardEntered(_id, msg.sender);
-    }
-
-    function settle(uint256 _id) external {
-        Forward memory forward = forwards[_id];
-
-        require(msg.sender == forward.seller || msg.sender == forward.buyer, "not authorized");
-        // Check forward is entered and not deleted
-        require(forward.status == Status.Entered, "forward not entered");
-        require(forward.maturity <= block.timestamp, "not expired");
-
-        underlyingAsset.transfer(forward.buyer, forward.quantity);
-        payToken.transfer(forward.seller, forward.strike);
-
-        delete forwards[_id];
-
-        emit ForwardSettled(_id);
+        underlyingAsset.transfer(buyer, quantity);
+        payToken.transfer(seller, strike);
     }
 }
