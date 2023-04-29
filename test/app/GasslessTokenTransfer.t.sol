@@ -27,45 +27,20 @@ contract GasslessTokenTransferTest is Test {
         gassless = new GasslessTokenTransfer();
     }
 
-    function _prepareSignatures(uint256 deadline)
-        private
-        view
-        returns (uint8[2] memory vs, bytes32[2] memory rs, bytes32[2] memory ss)
-    {
-        // Sender - prepare permit signature
-        bytes32 permitHash = _getPermitHash(sender, address(gassless), AMOUNT + FEE, deadline, token.nonces(sender));
-        (vs[1], rs[1], ss[1]) = vm.sign(SENDER_PRIVATE_KEY, permitHash);
-
-        // token.permit(sender, address(gassless), AMOUNT + FEE, deadline, vs[1], rs[1], ss[1]);
-
-        // Sender - prepare gassless token transfer signature
-        bytes32 transferHash = gassless.getEthSignedMessageHash(
-            gassless.getMessageHash(address(token), sender, receiver, AMOUNT, FEE, deadline, gassless.nonces(sender))
-        );
-        (vs[0], rs[0], ss[0]) = vm.sign(SENDER_PRIVATE_KEY, transferHash);
-
-        return (vs, rs, ss);
-    }
-
     function testValidSig() public {
         uint256 deadline = block.timestamp + 60;
-        (uint8[2] memory vs, bytes32[2] memory rs, bytes32[2] memory ss) = _prepareSignatures(deadline);
+
+        // Sender - prepare permit signature
+        bytes32 permitHash = _getPermitHash(sender, address(gassless), AMOUNT + FEE, deadline, token.nonces(sender));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(SENDER_PRIVATE_KEY, permitHash);
 
         // Execute transfer
-        gassless.send(address(token), sender, receiver, AMOUNT, FEE, deadline, vs, rs, ss);
+        gassless.send(address(token), sender, receiver, AMOUNT, FEE, deadline, v, r, s);
 
         // Check balances
         assertEq(token.balanceOf(sender), 0, "sender balance");
         assertEq(token.balanceOf(receiver), AMOUNT, "receiver balance");
         assertEq(token.balanceOf(address(this)), FEE, "fee");
-    }
-
-    function testInvalidSig() public {
-        uint256 deadline = block.timestamp + 60;
-        (uint8[2] memory vs, bytes32[2] memory rs, bytes32[2] memory ss) = _prepareSignatures(deadline);
-
-        vm.expectRevert("invalid signature");
-        gassless.send(address(token), sender, receiver, AMOUNT + 1, FEE, deadline, vs, rs, ss);
     }
 
     function _getPermitHash(address owner, address spender, uint256 value, uint256 deadline, uint256 nonce)
