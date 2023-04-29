@@ -9,10 +9,10 @@ contract SignTest is Test {
         address alice = vm.addr(privateKey);
 
         // Test valid signature
-        bytes32 hash = keccak256("Signed by Alice");
+        bytes32 messageHash = keccak256("Signed by Alice");
 
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, hash);
-        address signer = ecrecover(hash, v, r, s);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, messageHash);
+        address signer = ecrecover(messageHash, v, r, s);
 
         assertEq(signer, alice);
 
