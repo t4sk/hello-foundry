@@ -16,8 +16,6 @@ contract GasslessTokenTransfer {
         bytes32 r,
         bytes32 s
     ) external {
-        require(deadline > block.timestamp, "expired");
-
         // Permit
         IERC20Permit(token).permit(sender, address(this), amount + fee, deadline, v, r, s);
         // Send amount to receiver
