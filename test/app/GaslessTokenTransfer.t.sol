@@ -5,11 +5,11 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 import "../../src/ERC20Permit.sol";
-import "../../src/app/GasslessTokenTransfer.sol";
+import "../../src/app/GaslessTokenTransfer.sol";
 
-contract GasslessTokenTransferTest is Test {
+contract GaslessTokenTransferTest is Test {
     ERC20Permit private token;
-    GasslessTokenTransfer private gassless;
+    GaslessTokenTransfer private gasless;
 
     uint256 constant SENDER_PRIVATE_KEY = 111;
     address sender;
@@ -24,18 +24,18 @@ contract GasslessTokenTransferTest is Test {
         token = new ERC20Permit("Test", "TEST", 18);
         token.mint(sender, AMOUNT + FEE);
 
-        gassless = new GasslessTokenTransfer();
+        gasless = new GaslessTokenTransfer();
     }
 
     function testValidSig() public {
         uint256 deadline = block.timestamp + 60;
 
         // Sender - prepare permit signature
-        bytes32 permitHash = _getPermitHash(sender, address(gassless), AMOUNT + FEE, deadline, token.nonces(sender));
+        bytes32 permitHash = _getPermitHash(sender, address(gasless), AMOUNT + FEE, deadline, token.nonces(sender));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(SENDER_PRIVATE_KEY, permitHash);
 
         // Execute transfer
-        gassless.send(address(token), sender, receiver, AMOUNT, FEE, deadline, v, r, s);
+        gasless.send(address(token), sender, receiver, AMOUNT, FEE, deadline, v, r, s);
 
         // Check balances
         assertEq(token.balanceOf(sender), 0, "sender balance");

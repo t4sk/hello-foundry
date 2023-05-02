@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import "../interfaces/IERC20Permit.sol";
 
-contract GasslessTokenTransfer {
+contract GaslessTokenTransfer {
     function send(
         address token,
         address sender,
