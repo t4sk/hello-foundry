@@ -88,7 +88,7 @@ forge test --match-path test/Console.t.sol -vv
     -   custom error
     -   label assertions
 -   [x] Test event (expectEmit)
--   [ ] TODO: Test time (`Auction.sol`)
+-   [x] Test time (`Auction.sol`)
 -   [ ] Test send eth (`Wallet.sol`)
     -   [ ] hoax, deal
 -   [ ] Test signature
