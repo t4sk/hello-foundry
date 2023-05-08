@@ -4,6 +4,10 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {Wallet} from "../src/Wallet.sol";
 
+// Examples of deal and hoax
+// deal(addres, uint) - Set balance of address
+// hoax(address, uint) - deal + prank, Sets up a prank and set balance
+
 contract WalletTest is Test {
     Wallet public wallet;
 
@@ -14,6 +18,7 @@ contract WalletTest is Test {
     // Receive ETH from wallet
     receive() external payable {}
 
+    // Check how much ETH available for test
     function testLogBalance() public {
         console.log("ETH balance", address(this).balance / 1e18);
     }
@@ -23,30 +28,25 @@ contract WalletTest is Test {
         require(ok, "send ETH failed");
     }
 
-    // Examples of hoax and deal
-    // hoax - Sets up a prank from an address that has some ether
-    // deal - Set balance
     function testSendEth() public {
-        uint256 bal = address(wallet).balance;
-        assertEq(bal, 1e18);
+        uint bal = address(wallet).balance;
 
-        hoax(address(1), 123);
-        assertEq(address(1).balance, 123);
+        // deal
+        deal(address(1), 100);
+        assertEq(address(1).balance, 100);
+
+        deal(address(1), 10);
+        assertEq(address(1).balance, 10);
+
+        // hoax = deal + prank
+        deal(address(1), 123);
+        vm.prank(address(1));
         _send(123);
 
-        bal += 123;
-        assertEq(address(1).balance, 0);
-        assertEq(address(wallet).balance, bal);
-
-        deal(address(1), 1e18);
-        assertEq(address(1).balance, 1e18);
-
-        vm.prank(address(1));
+        hoax(address(1), 456);
         _send(456);
 
-        bal += 456;
-        assertEq(address(1).balance, 1e18 - 456);
-        assertEq(address(wallet).balance, bal);
+        assertEq(address(wallet).balance, bal + 123 + 456);
     }
 
     function testFailWithdrawNotOwner() public {
