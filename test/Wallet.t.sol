@@ -29,7 +29,7 @@ contract WalletTest is Test {
     }
 
     function testSendEth() public {
-        uint bal = address(wallet).balance;
+        uint256 bal = address(wallet).balance;
 
         // deal
         deal(address(1), 100);

@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 contract Wallet {
     address payable public owner;
 
-    event Deposit(address account, uint amount);
+    event Deposit(address account, uint256 amount);
 
     constructor() payable {
         owner = payable(msg.sender);
