@@ -3,12 +3,12 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-import {ERC20} from "../../src/ERC20.sol";
+import {Token} from "../../src/Token.sol";
 import {PrepaidForward, Status} from "../../src/defi/PrepaidForward.sol";
 
 contract PrepaidForwardTest is Test {
-    ERC20 private underlying;
-    ERC20 private payToken;
+    Token private underlying;
+    Token private payToken;
     PrepaidForward private prepaidForward;
 
     uint256 private constant QUANTITY = 10;
@@ -19,18 +19,16 @@ contract PrepaidForwardTest is Test {
     address private constant BUYER = address(2);
 
     function setUp() public {
-        underlying = new ERC20("underlying", "underlying", 18);
-        payToken = new ERC20("pay", "pay", 18);
+        underlying = new Token("underlying", "underlying", 18);
+        payToken = new Token("pay", "pay", 18);
         prepaidForward = new PrepaidForward(underlying, payToken, SELLER, QUANTITY, STRIKE, MATURITY);
 
-        vm.prank(SELLER);
-        underlying.mint(QUANTITY);
+        underlying.mint(SELLER, QUANTITY);
 
         vm.prank(SELLER);
         underlying.approve(address(prepaidForward), QUANTITY);
 
-        vm.prank(BUYER);
-        payToken.mint(STRIKE);
+        payToken.mint(BUYER, STRIKE);
 
         vm.prank(BUYER);
         payToken.approve(address(prepaidForward), STRIKE);
