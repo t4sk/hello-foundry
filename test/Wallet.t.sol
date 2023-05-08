@@ -5,7 +5,7 @@ import "forge-std/console.sol";
 import {Wallet} from "../src/Wallet.sol";
 
 // Examples of deal and hoax
-// deal(addres, uint) - Set balance of address
+// deal(address, uint) - Set balance of address
 // hoax(address, uint) - deal + prank, Sets up a prank and set balance
 
 contract WalletTest is Test {
