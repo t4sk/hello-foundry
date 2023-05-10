@@ -89,8 +89,7 @@ forge test --match-path test/Console.t.sol -vv
     -   label assertions
 -   [x] Test event (expectEmit)
 -   [x] Test time (`Auction.sol`)
--   [ ] Test send eth (`Wallet.sol`)
-    -   [ ] hoax, deal
+-   [x] Test send eth (`Wallet.sol`) - hoax, deal
 -   [ ] Test signature
 -   [ ] TODO: Cheatcode
 
