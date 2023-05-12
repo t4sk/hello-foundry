@@ -33,7 +33,8 @@ contract Auth {
 
 // NFT
 interface IFixedYieldBond is IERC721 {
-// function mint(address account, uint256 fyAmount) external returns (uint256);
+    // function mint(address account, uint256 fyAmount) external returns (uint256);
+    function getBond(uint256 id) external view returns (ZeroCouponBond memory);
 }
 
 enum BondState {
@@ -46,11 +47,12 @@ struct ZeroCouponBond {
     BondState state;
     address issuer;
     uint256 debt;
-    uint256 duration;
-    uint256 collateral;
-    uint256 minBorrow;
-    uint256 nonce;
+    uint256 loanDuration;
+    uint256 collateralAmount;
     uint256 createdAt;
+    // 1e18 = 100% / second
+    uint256 discountRate;
+    uint256 minBorrow;
     address buyer;
     uint256 soldAt;
 }
@@ -59,61 +61,152 @@ contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
     IERC20 public immutable collateral;
     IERC20 public immutable coin;
 
+    uint256 private nonce;
     mapping(uint256 => ZeroCouponBond) public bonds;
+
+    function getBond(uint256 id) external view returns (ZeroCouponBond memory) {
+        return bonds[id];
+    }
 
     constructor(IERC20 _collateral, IERC20 _coin) {
         collateral = _collateral;
         coin = _coin;
     }
 
-    function mint(uint256 debt, uint256 duration, uint256 coll, uint256 minBorrow, uint256 nonce)
-        external
-        returns (uint256)
-    {
-        require(duration > 0, "invalid duration");
+    struct MintParams {
+        uint256 debt;
+        uint256 loanDuration;
+        uint256 collateralAmount;
+        uint256 discountRate;
+        uint256 minBorrow;
+    }
 
-        uint256 id = uint256(keccak256(abi.encode(msg.sender, debt, duration, coll, minBorrow, nonce)));
-        require(bonds[id].state == BondState.NotCreated, "created");
+    function mint(MintParams memory params) external returns (uint256) {
+        require(params.loanDuration > 0, "invalid loan duration");
+        require(params.discountRate <= 1e18, "discount rate > 1e18");
+        require(params.debt >= params.minBorrow, "debt < min borrow");
+
+        nonce += 1;
+        uint256 id = nonce;
+        // require(bonds[id].state == BondState.NotCreated, "created");
 
         // Start Dutch auction
         bonds[id] = ZeroCouponBond({
             state: BondState.Created,
             issuer: msg.sender,
-            debt: debt,
-            duration: duration,
-            collateral: coll,
-            minBorrow: minBorrow,
-            nonce: nonce,
+            debt: params.debt,
+            loanDuration: params.loanDuration,
+            collateralAmount: params.collateralAmount,
             createdAt: block.timestamp,
+            discountRate: params.discountRate,
+            minBorrow: params.minBorrow,
             buyer: address(0),
             soldAt: 0
         });
 
-        collateral.transferFrom(msg.sender, address(this), coll);
+        collateral.transferFrom(msg.sender, address(this), params.collateralAmount);
 
         return id;
     }
 
-    function calcBorrowAmount(uint256 id) public view returns (uint256) {}
+    // TODO: cancel
 
-    function _calcBorrowAmount(ZeroCouponBond memory bond) private view returns (uint256) {}
+    function calcLoan(uint256 id) external view returns (uint256) {
+        ZeroCouponBond memory bond = bonds[id];
+        if (bond.state != BondState.Created) {
+            return 0;
+        }
+        return _calcLoan(bond);
+    }
 
-    function buy(uint256 id, uint256 maxLoanAmount) external {
+    function _calcLoan(ZeroCouponBond memory bond) private view returns (uint256) {
+        uint256 dt = block.timestamp - bond.createdAt;
+        uint256 discount = bond.discountRate * dt;
+        if (bond.debt >= discount) {
+            return max(bond.debt - discount, bond.minBorrow);
+        }
+        return bond.minBorrow;
+    }
+
+    // TODO: sell;
+
+    function buy(uint256 id) external {
         ZeroCouponBond storage bond = bonds[id];
         require(bond.state == BondState.Created, "not created");
 
-        uint256 borrowAmount = _calcBorrowAmount(bond);
-        require(bond.minBorrow >= borrowAmount, "min borrow < borrow amount");
-        require(borrowAmount <= maxLoanAmount, "borrow amount > max loan");
+        uint256 loan = _calcLoan(bond);
+        require(loan > 0, "loan = 0");
 
-        coin.transferFrom(msg.sender, bond.issuer, borrowAmount);
+        coin.transferFrom(msg.sender, bond.issuer, loan);
 
         bond.state = BondState.Sold;
+        // TODO: transfer ownership of NFT?
         bond.buyer = msg.sender;
         bond.soldAt = block.timestamp;
     }
 
+    function repay(uint256 id) external {
+        ZeroCouponBond storage bond = bonds[id];
+        require(bond.state == BondState.Sold, "not sold");
+        require(msg.sender == bond.issuer, "not authorized");
+
+        coin.transferFrom(msg.sender, bond.buyer, bond.debt);
+        collateral.transfer(msg.sender, bond.collateralAmount);
+
+        delete bonds[id];
+    }
+
+    // TODO: liquidate
+    function liquidate(uint256 id) external {
+        ZeroCouponBond storage bond = bonds[id];
+        require(bond.state == BondState.Sold, "not sold");
+        require(msg.sender == bond.buyer, "not authorized");
+
+        // Dutch auction
+        // buyer - debt -> loan -> min repay
+
+        // Dutch auction failed -> collateral transferred to buyer
+    }
+
     function burn() external {}
+
+    function max(uint256 x, uint256 y) private pure returns (uint256) {
+        return x >= y ? x : y;
+    }
+}
+
+struct Auction {
+    uint256 startingPrice;
+    uint256 minPrice;
+    uint256 createdAt;
+}
+
+contract CollateralAuctionHouse {
+    IERC20 immutable collateral;
+    IERC20 immutable coin;
+    IFixedYieldBond immutable fyBond;
+
+    constructor(IERC20 _collateral, IERC20 _coin, IFixedYieldBond _fyBond) {
+        collateral = _collateral;
+        coin = _coin;
+        fyBond = _fyBond;
+    }
+
+    // function _calcLoan(ZeroCouponBond memory bond) private view returns (uint256) {
+    //     uint256 dt = block.timestamp - bond.createdAt;
+    //     uint256 discount = bond.discountRate * dt;
+    //     if (bond.debt >= discount) {
+    //         return max(bond.debt - discount, bond.minBorrow);
+    //     }
+    //     return bond.minBorrow;
+    // }
+
+    function start(uint256 nftId) external {
+        // ZeroCouponBond memory bond = fyBond.getBond(nftId);
+        fyBond.transferFrom(msg.sender, address(this), nftId);
+    }
+
+    function buy() external {}
 }
 
 // contract ZeroCouponBondMarket {
