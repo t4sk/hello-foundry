@@ -5,6 +5,7 @@ import "../lib/utils/VyperDeployer.sol";
 
 import "../src/IVyperStorage.sol";
 
+// source venv/bin/activate
 // forge test --match-path test/Vyper.t.sol --ffi
 contract VyperStorageTest is Test {
     VyperDeployer vyperDeployer = new VyperDeployer();
@@ -24,5 +25,9 @@ contract VyperStorageTest is Test {
         vyStorage.store(_val);
         uint256 val = vyStorage.get();
         assertEq(val, _val);
+    }
+
+    function invariant_test() public {
+        assertTrue(true);
     }
 }
