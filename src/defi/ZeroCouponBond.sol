@@ -34,7 +34,9 @@ contract Auth {
 // NFT
 interface IFixedYieldBond is IERC721 {
     // function mint(address account, uint256 fyAmount) external returns (uint256);
-    function getBond(uint256 id) external view returns (ZeroCouponBond memory);
+    function getBond(uint256 id) external view returns (Bond memory);
+
+    function burn(uint256 id) external;
 }
 
 enum BondState {
@@ -43,18 +45,13 @@ enum BondState {
     Sold
 }
 
-struct ZeroCouponBond {
+struct Bond {
     BondState state;
     address issuer;
     uint256 debt;
-    uint256 loanDuration;
-    uint256 collateralAmount;
-    uint256 createdAt;
-    // 1e18 = 100% / second
-    uint256 discountRate;
     uint256 minBorrow;
-    address buyer;
-    uint256 soldAt;
+    uint256 duration;
+    uint256 collateral;
 }
 
 contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
@@ -62,9 +59,9 @@ contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
     IERC20 public immutable coin;
 
     uint256 private nonce;
-    mapping(uint256 => ZeroCouponBond) public bonds;
+    mapping(uint256 => Bond) public bonds;
 
-    function getBond(uint256 id) external view returns (ZeroCouponBond memory) {
+    function getBond(uint256 id) external view returns (Bond memory) {
         return bonds[id];
     }
 
@@ -75,116 +72,79 @@ contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
 
     struct MintParams {
         uint256 debt;
-        uint256 loanDuration;
-        uint256 collateralAmount;
+        uint256 duration;
+        uint256 collateral;
         uint256 discountRate;
         uint256 minBorrow;
     }
 
     function mint(MintParams memory params) external returns (uint256) {
-        require(params.loanDuration > 0, "invalid loan duration");
-        require(params.discountRate <= 1e18, "discount rate > 1e18");
+        require(params.duration > 0, "invalid loan duration");
         require(params.debt >= params.minBorrow, "debt < min borrow");
 
         nonce += 1;
         uint256 id = nonce;
-        // require(bonds[id].state == BondState.NotCreated, "created");
 
-        // Start Dutch auction
-        bonds[id] = ZeroCouponBond({
+        bonds[id] = Bond({
             state: BondState.Created,
             issuer: msg.sender,
             debt: params.debt,
-            loanDuration: params.loanDuration,
-            collateralAmount: params.collateralAmount,
-            createdAt: block.timestamp,
-            discountRate: params.discountRate,
             minBorrow: params.minBorrow,
-            buyer: address(0),
-            soldAt: 0
+            duration: params.duration,
+            collateral: params.collateral
         });
 
-        collateral.transferFrom(msg.sender, address(this), params.collateralAmount);
+        collateral.transferFrom(msg.sender, address(this), params.collateral);
 
         return id;
     }
 
     // TODO: cancel
-
-    function calcLoan(uint256 id) external view returns (uint256) {
-        ZeroCouponBond memory bond = bonds[id];
-        if (bond.state != BondState.Created) {
-            return 0;
-        }
-        return _calcLoan(bond);
-    }
-
-    function _calcLoan(ZeroCouponBond memory bond) private view returns (uint256) {
-        uint256 dt = block.timestamp - bond.createdAt;
-        uint256 discount = bond.discountRate * dt;
-        if (bond.debt >= discount) {
-            return max(bond.debt - discount, bond.minBorrow);
-        }
-        return bond.minBorrow;
-    }
-
-    // TODO: sell;
-
-    function buy(uint256 id) external {
-        ZeroCouponBond storage bond = bonds[id];
-        require(bond.state == BondState.Created, "not created");
-
-        uint256 loan = _calcLoan(bond);
-        require(loan > 0, "loan = 0");
-
-        coin.transferFrom(msg.sender, bond.issuer, loan);
-
-        bond.state = BondState.Sold;
-        // TODO: transfer ownership of NFT?
-        bond.buyer = msg.sender;
-        bond.soldAt = block.timestamp;
-    }
+    // require(msg.sender == owner, "not owner");
 
     function repay(uint256 id) external {
-        ZeroCouponBond storage bond = bonds[id];
-        require(bond.state == BondState.Sold, "not sold");
+        // TODO: after loan duration?
+        Bond storage bond = bonds[id];
+        // TODO: require(bond.state == BondState.Sold, "not sold");
         require(msg.sender == bond.issuer, "not authorized");
 
-        coin.transferFrom(msg.sender, bond.buyer, bond.debt);
-        collateral.transfer(msg.sender, bond.collateralAmount);
+        address owner = _ownerOf[id];
+        coin.transferFrom(msg.sender, owner, bond.debt);
+        collateral.transfer(msg.sender, bond.collateral);
 
         delete bonds[id];
     }
 
-    // TODO: liquidate
-    function liquidate(uint256 id) external {
-        ZeroCouponBond storage bond = bonds[id];
-        require(bond.state == BondState.Sold, "not sold");
-        require(msg.sender == bond.buyer, "not authorized");
-
-        // Dutch auction
-        // buyer - debt -> loan -> min repay
-
-        // Dutch auction failed -> collateral transferred to buyer
-    }
-
-    function burn() external {}
+    function burn(uint256) external {}
 
     function max(uint256 x, uint256 y) private pure returns (uint256) {
         return x >= y ? x : y;
     }
 }
 
-struct Auction {
+enum BondAuctionState {
+    NotOpen,
+    Open
+}
+
+struct BondAuction {
+    BondAuctionState state;
+    uint256 fyBondId;
+    address seller;
     uint256 startingPrice;
     uint256 minPrice;
     uint256 createdAt;
 }
 
-contract CollateralAuctionHouse {
+contract BondAuctionHouse {
+    uint256 private constant DISCOUNT_DURATION = 3 days;
+
     IERC20 immutable collateral;
     IERC20 immutable coin;
     IFixedYieldBond immutable fyBond;
+
+    uint256 private nonce;
+    mapping(uint256 => BondAuction) public auctions;
 
     constructor(IERC20 _collateral, IERC20 _coin, IFixedYieldBond _fyBond) {
         collateral = _collateral;
@@ -192,84 +152,165 @@ contract CollateralAuctionHouse {
         fyBond = _fyBond;
     }
 
-    // function _calcLoan(ZeroCouponBond memory bond) private view returns (uint256) {
-    //     uint256 dt = block.timestamp - bond.createdAt;
-    //     uint256 discount = bond.discountRate * dt;
-    //     if (bond.debt >= discount) {
-    //         return max(bond.debt - discount, bond.minBorrow);
-    //     }
-    //     return bond.minBorrow;
-    // }
+    function start(uint256 fyBondId, uint256 startingPrice, uint256 minPrice) external {
+        // TODO: use create 2 + minimal proxy?
+        require(startingPrice > minPrice);
 
-    function start(uint256 nftId) external {
-        // ZeroCouponBond memory bond = fyBond.getBond(nftId);
-        fyBond.transferFrom(msg.sender, address(this), nftId);
+        fyBond.transferFrom(msg.sender, address(this), fyBondId);
+
+        nonce += 1;
+        uint256 id = nonce;
+
+        auctions[id] = BondAuction({
+            state: BondAuctionState.Open,
+            fyBondId: fyBondId,
+            seller: msg.sender,
+            startingPrice: startingPrice,
+            minPrice: minPrice,
+            createdAt: block.timestamp
+        });
     }
 
-    function buy() external {}
+    // TODO: function cancel
+
+    function calcPrice(uint256 id) external view returns (uint256) {
+        BondAuction memory auction = auctions[id];
+        require(auction.state != BondAuctionState.Open, "auction not open");
+        return _calcPrice(auction);
+    }
+
+    function _calcPrice(BondAuction memory auction) private view returns (uint256) {
+        uint256 discountEndsAt = auction.createdAt + DISCOUNT_DURATION;
+
+        if (discountEndsAt <= block.timestamp) {
+            return auction.minPrice;
+        }
+
+        // dt < DISCOUNT_DURATION
+        uint256 dt = block.timestamp - auction.createdAt;
+        uint256 discount = (auction.startingPrice - auction.minPrice) * dt / DISCOUNT_DURATION;
+
+        return auction.startingPrice - discount;
+    }
+
+    function buy(uint256 id) external {
+        BondAuction memory auction = auctions[id];
+        require(auction.state == BondAuctionState.Open, "auction not open");
+
+        uint256 price = _calcPrice(auction);
+        require(price >= auction.minPrice, "price < min price");
+
+        coin.transferFrom(msg.sender, auction.seller, price);
+        fyBond.transferFrom(address(this), msg.sender, auction.fyBondId);
+        // TODO: update bond state and discount rate?
+
+        delete auctions[id];
+    }
 }
 
-// contract ZeroCouponBondMarket {
-//     IERC20 public immutable coin;
-//     IFixedYieldBond public immutable fyBond;
+enum AuctionState {
+    NotOpen,
+    Open
+}
 
-//     constructor(IERC20 _coin, IFixedYieldBond _fyBond) {
-//         coin = _coin;
-//         fyBond = _fyBond;
-//     }
+struct Auction {
+    AuctionState state;
+    uint256 fyBondId;
+    address seller;
+    uint256 startingPrice;
+    uint256 minPrice;
+    uint256 discountRate;
+    uint256 expiresAt;
+    uint256 createdAt;
+}
 
-//     function sell(uint256 _nftId) external {
-//         fyBond.transferFrom(msg.sender, address(this), _nftId);
-//     }
+// TODO: use minimal proxy for each auction?
+contract CollateralAuctionHouse {
+    IERC20 immutable collateral;
+    IERC20 immutable coin;
+    IFixedYieldBond immutable fyBond;
 
-//     // TODO: cancel
+    uint256 private nonce;
+    mapping(uint256 => Auction) public auctions;
 
-//     // TODO: Auction or AMM
-//     function buy(uint256 _nftId) external {
-//         uint256  = 0;
-//         address nftOwner;
-//         uint256 fyAmount;
-//         coin.transferFrom(msg.sender, nftOwner, fyAmount);
-//         // TODO: can be resold?
-//         fyBond.transferFrom(address(this), msg.sender, _nftId);
-//     }
-// }
+    constructor(IERC20 _collateral, IERC20 _coin, IFixedYieldBond _fyBond) {
+        collateral = _collateral;
+        coin = _coin;
+        fyBond = _fyBond;
+    }
 
-// contract CollateralLock {
-//     IERC20 public immutable collateral;
-//     IERC20 public immutable coin;
-//     IFixedYieldBond public immutable fyBond;
+    function start(
+        uint256 fyBondId,
+        address seller,
+        uint256 startingPrice,
+        uint256 minPrice,
+        uint256 discountRate,
+        uint256 expiresAt
+    ) external {
+        // TODO: check bond state
+        fyBond.transferFrom(msg.sender, address(this), fyBondId);
 
-//     mapping(address => uint256) public collateralBalances;
+        nonce += 1;
+        uint256 id = nonce;
 
-//     constructor(IERC20 _collateral, IERC20 _coin, IFixedYieldBond _fyBond) {
-//         collateral = _collateral;
-//         coin = _coin;
-//         fyBond = _fyBond;
-//     }
+        auctions[id] = Auction({
+            state: AuctionState.Open,
+            fyBondId: fyBondId,
+            seller: seller,
+            startingPrice: startingPrice,
+            minPrice: minPrice,
+            discountRate: discountRate,
+            expiresAt: expiresAt,
+            createdAt: block.timestamp
+        });
+    }
 
-//     function lock(uint256 colAmount) external {
-//         collateral.transferFrom(msg.sender, address(this), colAmount);
-//         collateralBalances[msg.sender] += colAmount;
-//     }
+    function calcPrice(uint256 id) external view returns (uint256) {
+        Auction memory auction = auctions[id];
+        if (auction.state != AuctionState.Open) {
+            // TODO: return type(uint).max?
+            return 0;
+        }
 
-//     function borrow(uint256 fyAmount) external returns (uint256) {
-//         uint256 nftId = fyBond.mint(msg.sender, fyAmount);
-//         return nftId;
-//     }
+        return _calcPrice(auction);
+    }
 
-//     function repay(uint256 fyAmount) external {
-//         // TODO: fees after expiry
-//         coin.transferFrom(msg.sender, address(this), fyAmount);
-//         // TODO: calculate how much collateral to release
-//         uint256 colAmount;
-//         collateral.transfer(msg.sender, colAmount);
-//     }
+    function _calcPrice(Auction memory auction) private view returns (uint256) {
+        uint256 dt = block.timestamp - auction.createdAt;
+        uint256 discount = auction.discountRate * dt;
+        if (auction.startingPrice >= discount) {
+            return max(auction.startingPrice - discount, auction.minPrice);
+        }
+        return auction.minPrice;
+    }
 
-//     function withdraw() external {}
+    function buy(uint256 id) external {
+        Auction memory auction = auctions[id];
+        require(auction.state == AuctionState.Open, "auction not open");
+        require(block.timestamp < auction.expiresAt, "auction expired");
 
-//     // TODO: liquidation AMM or auction
-//     function liquidate() external {}
-// }
+        uint256 price = _calcPrice(auction);
+        require(price >= auction.minPrice, "price < min price");
 
-// contract PriceOracle {}
+        coin.transferFrom(msg.sender, auction.seller, price);
+        // TODO: update bond?
+        fyBond.transferFrom(address(this), msg.sender, auction.fyBondId);
+
+        delete auctions[id];
+    }
+
+    function seize(uint256 id) external {
+        Auction memory auction = auctions[id];
+        require(auction.state == AuctionState.Open, "auction not open");
+        require(block.timestamp >= auction.expiresAt, "auction not expired");
+
+        delete auctions[id];
+
+        // TODO: Transfer collateral?
+        fyBond.burn(auction.fyBondId);
+    }
+
+    function max(uint256 x, uint256 y) private pure returns (uint256) {
+        return x >= y ? x : y;
+    }
+}
