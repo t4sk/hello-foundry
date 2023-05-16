@@ -13,7 +13,9 @@ contract VyperStorageTest is Test {
     IVyperStorage vyStorage;
 
     function setUp() public {
-        vyStorage = IVyperStorage(vyperDeployer.deployContract("VyperStorage", abi.encode(1234)));
+        vyStorage = IVyperStorage(
+            vyperDeployer.deployContract("VyperStorage", abi.encode(1234))
+        );
     }
 
     function testGet() public {

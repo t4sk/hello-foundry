@@ -97,7 +97,9 @@ contract ActorManager is CommonBase, StdCheats, StdUtils {
     }
 
     function sendToFallback(uint256 handlerIndex, uint256 amount) public {
-        handlers[bound(handlerIndex, 0, handlers.length - 1)].sendToFallback(amount);
+        handlers[bound(handlerIndex, 0, handlers.length - 1)].sendToFallback(
+            amount
+        );
     }
 
     function deposit(uint256 handlerIndex, uint256 amount) public {
@@ -133,7 +135,9 @@ contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
         selectors[1] = ActorManager.withdraw.selector;
         selectors[2] = ActorManager.sendToFallback.selector;
 
-        targetSelector(FuzzSelector({addr: address(manager), selectors: selectors}));
+        targetSelector(
+            FuzzSelector({addr: address(manager), selectors: selectors})
+        );
 
         targetContract(address(manager));
     }
