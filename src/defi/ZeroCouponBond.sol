@@ -93,156 +93,221 @@ contract BondStorage is Auth {
         return id;
     }
 
-    function update() external onlyAuthorized {}
+    function _isValidStateTransition(BondState pre, BondState next)
+        private
+        pure
+        returns (bool)
+    {
+        if (pre == BondState.Created) {
+            return next == BondState.Sold;
+        }
+        return false;
+    }
+
+    function update(uint256 id, BondState state) external onlyAuthorized {
+        Bond storage bond = bonds[id];
+        require(
+            _isValidStateTransition(bond.state, state),
+            "invalid bond state transition"
+        );
+        bond.state = state;
+    }
 
     function remove(uint256 id) external onlyAuthorized {
+        Bond memory bond = bonds[id];
+        require(bond.state == BondState.Created, "invalid bond state");
         delete bonds[id];
     }
 }
 
-// interface IBondEngine {
-//     function create(address issuer, uint debt, uint duration, uint collateral) external returns (uint);
-//     function get(uint256 id) external view returns (Bond memory);
-//     function remove(uint id) external;
-// }
+interface IBondStorage {
+    function get(uint256 id) external view returns (Bond memory);
+    function create(
+        address issuer,
+        uint256 debt,
+        uint256 duration,
+        uint256 collateral
+    ) external returns (uint256);
+    function update(uint256 id, BondState state) external;
+    function remove(uint256 id) external;
+}
 
-// contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
-//     IERC20 public immutable collateral;
-//     IERC20 public immutable coin;
-//     IBondEngine public immutable engine;
+// TODO: leverage?
+// TODO: any coin, multi-collateral
 
-//     constructor(IERC20 _collateral, IERC20 _coin, IBondEngine _engine) {
-//         collateral = _collateral;
-//         coin = _coin;
-//         engine = _engine;
-//     }
+contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
+    IERC20 public immutable collateral;
+    IERC20 public immutable coin;
+    IBondStorage public immutable bondStorage;
 
-//     // TODO: perpetual?
-//     function mint(uint debt, uint duration, uint collateralAmount) external returns (uint256) {
-//         uint id = engine.create({
-//             issuer: msg.sender,
-//             debt: debt,
-//             duration: duration,
-//             collateral: collateralAmount
-//         });
+    constructor(IERC20 _collateral, IERC20 _coin, IBondStorage _bondStorage) {
+        collateral = _collateral;
+        coin = _coin;
+        bondStorage = _bondStorage;
+    }
 
-//         _mint(msg.sender, id);
+    // TODO: perpetual?
+    function mint(uint256 debt, uint256 duration, uint256 collateralAmount)
+        external
+        returns (uint256)
+    {
+        uint256 id = bondStorage.create({
+            issuer: msg.sender,
+            debt: debt,
+            duration: duration,
+            collateral: collateralAmount
+        });
 
-//         collateral.transferFrom(msg.sender, address(this), collateralAmount);
+        _mint(msg.sender, id);
 
-//         return id;
-//     }
+        collateral.transferFrom(msg.sender, address(this), collateralAmount);
 
-//     // TODO: cancel
-//     // require(msg.sender == owner, "not owner");
+        return id;
+    }
 
-//     function repay(uint256 id) external {
-//         // TODO: after loan duration?
-//         Bond memory bond = engine.get(id);
-//         require(bond.state == BondState.Sold, "not sold");
-//         require(msg.sender == bond.issuer, "not authorized");
+    function burn(uint256 id) external {
+        address owner = _ownerOf[id];
+        require(msg.sender == owner, "not authorized");
 
-//         address owner = _ownerOf[id];
-//         coin.transferFrom(msg.sender, owner, bond.debt);
-//         collateral.transfer(msg.sender, bond.collateral);
+        Bond memory bond = bondStorage.get(id);
+        // TODO: require(msg.sender == bond.issuer, "not authorized");
+        require(bond.state == BondState.Created, "invalid bond state");
 
-//         engine.remove(id);
-//     }
+        _burn(id);
 
-//     function burn(uint256) external {}
-// }
+        bondStorage.remove(id);
+        collateral.transfer(msg.sender, bond.collateral);
+    }
 
-// enum BondAuctionState {
-//     NotOpen,
-//     Open
-// }
+    // TODO: update debtor on transfer?
 
-// struct BondAuction {
-//     BondAuctionState state;
-//     uint256 fyBondId;
-//     address seller;
-//     uint256 startingPrice;
-//     uint256 minPrice;
-//     uint256 createdAt;
-// }
+    function repay(uint256 id) external {
+        // TODO: after loan duration?
+        Bond memory bond = bondStorage.get(id);
+        require(bond.state == BondState.Sold, "invalid bond state");
+        // TODO: require(msg.sender == bond.issuer, "not authorized");
 
-// contract BondAuctionHouse {
-//     uint256 private constant DISCOUNT_DURATION = 3 days;
+        bondStorage.remove(id);
 
-//     IERC20 immutable collateral;
-//     IERC20 immutable coin;
-//     IBondEngine immutable engine;
-//     IFixedYieldBond immutable fyBond;
+        address owner = _ownerOf[id];
+        coin.transferFrom(msg.sender, owner, bond.debt);
+        collateral.transfer(msg.sender, bond.collateral);
+    }
+}
 
-//     uint256 private nonce;
-//     mapping(uint256 => BondAuction) public auctions;
+enum BondAuctionState {
+    NotOpen,
+    Open
+}
 
-//     constructor(IERC20 _collateral, IERC20 _coin, IBondEngine _engine, IFixedYieldBond _fyBond) {
-//         collateral = _collateral;
-//         coin = _coin;
-//         engine = _engine;
-//         fyBond = _fyBond;
-//     }
+struct BondAuction {
+    BondAuctionState state;
+    uint256 bondId;
+    address seller;
+    uint256 startingPrice;
+    uint256 minPrice;
+    uint256 createdAt;
+}
 
-//     function start(uint256 fyBondId, uint256 startingPrice, uint256 minPrice) external {
-//         // TODO: use create 2 + minimal proxy?
-//         // TODO: starting price == debt
-//         require(startingPrice > minPrice);
+contract BondAuctionHouse {
+    // TODO:  events
+    uint256 private constant DISCOUNT_DURATION = 3 days;
 
-//         fyBond.transferFrom(msg.sender, address(this), fyBondId);
+    IERC20 immutable collateral;
+    IERC20 immutable coin;
+    IBondStorage immutable bondStorage;
+    IFixedYieldBond immutable fyBond;
 
-//         nonce += 1;
-//         uint256 id = nonce;
+    uint256 private nonce;
+    mapping(uint256 => BondAuction) public auctions;
 
-//         auctions[id] = BondAuction({
-//             state: BondAuctionState.Open,
-//             fyBondId: fyBondId,
-//             seller: msg.sender,
-//             startingPrice: startingPrice,
-//             minPrice: minPrice,
-//             createdAt: block.timestamp
-//         });
+    constructor(
+        IERC20 _collateral,
+        IERC20 _coin,
+        IBondStorage _bondStorage,
+        IFixedYieldBond _fyBond
+    ) {
+        collateral = _collateral;
+        coin = _coin;
+        bondStorage = _bondStorage;
+        fyBond = _fyBond;
+    }
 
-//         // TODO: update bond state?
-//     }
+    function start(uint256 bondId, uint256 minPrice) external {
+        // TODO: use create 2 + minimal proxy?
 
-//     // TODO: function cancel
+        Bond memory bond = bondStorage.get(bondId);
+        require(bond.state == BondState.Created, "invalid bond state");
+        // TODO: require(msg.sender == bond.issuer, "not authorized");
+        require(minPrice <= bond.debt, "min price > starting price");
 
-//     function calcPrice(uint256 id) external view returns (uint256) {
-//         BondAuction memory auction = auctions[id];
-//         require(auction.state != BondAuctionState.Open, "auction not open");
-//         return _calcPrice(auction);
-//     }
+        // TODO: require msg.sender == bond.issuer == bond owner?
+        fyBond.transferFrom(msg.sender, address(this), bondId);
 
-//     function _calcPrice(BondAuction memory auction) private view returns (uint256) {
-//         uint256 discountEndsAt = auction.createdAt + DISCOUNT_DURATION;
+        nonce += 1;
+        uint256 id = nonce;
 
-//         if (discountEndsAt <= block.timestamp) {
-//             return auction.minPrice;
-//         }
+        auctions[id] = BondAuction({
+            state: BondAuctionState.Open,
+            bondId: bondId,
+            seller: msg.sender,
+            startingPrice: bond.debt,
+            minPrice: minPrice,
+            createdAt: block.timestamp
+        });
+    }
 
-//         // dt < DISCOUNT_DURATION
-//         uint256 dt = block.timestamp - auction.createdAt;
-//         uint256 discount = (auction.startingPrice - auction.minPrice) * dt / DISCOUNT_DURATION;
+    function cancel(uint256 auctionId) external {
+        BondAuction memory auction = auctions[auctionId];
+        require(msg.sender == auction.seller, "not authorized");
+        require(auction.state == BondAuctionState.Open, "invalid auction state");
 
-//         return auction.startingPrice - discount;
-//     }
+        delete auctions[auctionId];
 
-//     function buy(uint256 id) external {
-//         BondAuction memory auction = auctions[id];
-//         require(auction.state == BondAuctionState.Open, "auction not open");
+        fyBond.transferFrom(address(this), msg.sender, auction.bondId);
+    }
 
-//         uint256 price = _calcPrice(auction);
-//         require(price >= auction.minPrice, "price < min price");
+    function calcPrice(uint256 id) external view returns (uint256) {
+        BondAuction memory auction = auctions[id];
+        require(auction.state != BondAuctionState.Open, "auction not open");
+        return _calcPrice(auction);
+    }
 
-//         coin.transferFrom(msg.sender, auction.seller, price);
-//         fyBond.transferFrom(address(this), msg.sender, auction.fyBondId);
+    function _calcPrice(BondAuction memory auction)
+        private
+        view
+        returns (uint256)
+    {
+        uint256 discountEndsAt = auction.createdAt + DISCOUNT_DURATION;
 
-//         // TODO: update bond state and discount rate?
+        if (discountEndsAt <= block.timestamp) {
+            return auction.minPrice;
+        }
 
-//         delete auctions[id];
-//     }
-// }
+        // dt < DISCOUNT_DURATION
+        uint256 dt = block.timestamp - auction.createdAt;
+        uint256 discount =
+            (auction.startingPrice - auction.minPrice) * dt / DISCOUNT_DURATION;
+
+        return auction.startingPrice - discount;
+    }
+
+    function buy(uint256 id) external {
+        BondAuction memory auction = auctions[id];
+        require(auction.state == BondAuctionState.Open, "auction not open");
+
+        uint256 price = _calcPrice(auction);
+        require(price >= auction.minPrice, "price < min price");
+
+        delete auctions[id];
+
+        bondStorage.update(auction.bondId, BondState.Sold);
+
+        // TODO: require auction.seller == bond.issuer?
+        coin.transferFrom(msg.sender, auction.seller, price);
+        fyBond.transferFrom(address(this), msg.sender, auction.bondId);
+    }
+}
 
 // enum CollateralAuctionState {
 //     NotOpen,
