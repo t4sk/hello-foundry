@@ -146,7 +146,7 @@ contract FixedYieldBond is IFixedYieldBond, ERC721, Auth {
         bondStorage = _bondStorage;
     }
 
-    // TODO: perpetual?
+    // TODO: must be perpetual?
     function mint(uint256 debt, uint256 duration, uint256 collateralAmount)
         external
         returns (uint256)
@@ -210,7 +210,7 @@ struct BondAuction {
 }
 
 contract BondAuctionHouse {
-    // TODO:  events
+    // TODO: events
     uint256 private constant DISCOUNT_DURATION = 3 days;
 
     IERC20 immutable collateral;
@@ -309,113 +309,123 @@ contract BondAuctionHouse {
     }
 }
 
-// enum CollateralAuctionState {
-//     NotOpen,
-//     Open
-// }
+enum CollateralAuctionState {
+    NotOpen,
+    Open
+}
 
-// struct CollateralAuction {
-//     CollateralAuctionState state;
-//     uint256 fyBondId;
-//     address seller;
-//     uint256 startingPrice;
-//     uint256 minPrice;
-//     uint256 discountRate;
-//     uint256 expiresAt;
-//     uint256 createdAt;
-// }
+struct CollateralAuction {
+    CollateralAuctionState state;
+    uint256 bondId;
+    address seller;
+    uint256 startingPrice;
+    uint256 minPrice;
+    uint256 discountRate;
+    uint256 expiresAt;
+    uint256 createdAt;
+}
 
-// // TODO: use minimal proxy for each CollateralAuction?
-// contract CollateralAuctionHouse {
-//     IERC20 immutable collateral;
-//     IERC20 immutable coin;
-//     IFixedYieldBond immutable fyBond;
+// TODO: use minimal proxy for each CollateralAuction?
+contract CollateralAuctionHouse {
+    IERC20 immutable collateral;
+    IERC20 immutable coin;
+    IBondStorage immutable bondStorage;
+    IFixedYieldBond immutable fyBond;
 
-//     uint256 private nonce;
-//     mapping(uint256 => CollateralAuction) public auctions;
+    uint256 private nonce;
+    mapping(uint256 => CollateralAuction) public auctions;
 
-//     constructor(IERC20 _collateral, IERC20 _coin, IFixedYieldBond _fyBond) {
-//         collateral = _collateral;
-//         coin = _coin;
-//         fyBond = _fyBond;
-//     }
+    constructor(
+        IERC20 _collateral,
+        IERC20 _coin,
+        IFixedYieldBond _fyBond,
+        IBondStorage _bondStorage
+    ) {
+        collateral = _collateral;
+        coin = _coin;
+        bondStorage = _bondStorage;
+        fyBond = _fyBond;
+    }
 
-//     function start(
-//         uint256 fyBondId,
-//         address seller,
-//         uint256 startingPrice,
-//         uint256 minPrice,
-//         uint256 discountRate,
-//         uint256 expiresAt
-//     ) external {
-//         // TODO: check bond state
-//         fyBond.transferFrom(msg.sender, address(this), fyBondId);
+    function start(
+        uint256 bondId,
+        uint256 minPrice,
+        uint256 discountRate,
+        uint256 expiresAt
+    ) external {
+        // TODO: valdiate
 
-//         nonce += 1;
-//         uint256 id = nonce;
+        Bond memory bond = bondStorage.get(bondId);
+        require(bond.state == BondState.Sold, "invalid bond state");
+        require(minPrice <= bond.debt, "min price > starting price");
 
-//         auctions[id] = CollateralAuction({
-//             state: CollateralAuctionState.Open,
-//             fyBondId: fyBondId,
-//             seller: seller,
-//             startingPrice: startingPrice,
-//             minPrice: minPrice,
-//             discountRate: discountRate,
-//             expiresAt: expiresAt,
-//             createdAt: block.timestamp
-//         });
+        fyBond.transferFrom(msg.sender, address(this), bondId);
 
-//         // TODO: update bond state?
-//     }
+        nonce += 1;
+        uint256 id = nonce;
 
-//     function calcPrice(uint256 id) external view returns (uint256) {
-//         CollateralAuction memory auction = auctions[id];
-//         if (auction.state != CollateralAuctionState.Open) {
-//             // TODO: return type(uint).max?
-//             return 0;
-//         }
+        auctions[id] = CollateralAuction({
+            state: CollateralAuctionState.Open,
+            bondId: bondId,
+            seller: msg.sender,
+            startingPrice: bond.debt,
+            minPrice: minPrice,
+            discountRate: discountRate,
+            expiresAt: expiresAt,
+            createdAt: block.timestamp
+        });
 
-//         return _calcPrice(auction);
-//     }
+        // TODO: update bond state?
+    }
 
-//     function _calcPrice(CollateralAuction memory auction) private view returns (uint256) {
-//         uint256 dt = block.timestamp - auction.createdAt;
-//         uint256 discount = auction.discountRate * dt;
-//         if (auction.startingPrice >= discount) {
-//             return max(auction.startingPrice - discount, auction.minPrice);
-//         }
-//         return auction.minPrice;
-//     }
+    // function calcPrice(uint256 id) external view returns (uint256) {
+    //     CollateralAuction memory auction = auctions[id];
+    //     if (auction.state != CollateralAuctionState.Open) {
+    //         // TODO: return type(uint).max?
+    //         return 0;
+    //     }
 
-//     function buy(uint256 id) external {
-//         CollateralAuction memory auction = auctions[id];
-//         require(auction.state == CollateralAuctionState.Open, "auction not open");
-//         require(block.timestamp < auction.expiresAt, "auction expired");
+    //     return _calcPrice(auction);
+    // }
 
-//         uint256 price = _calcPrice(auction);
-//         require(price >= auction.minPrice, "price < min price");
+    // function _calcPrice(CollateralAuction memory auction) private view returns (uint256) {
+    //     uint256 dt = block.timestamp - auction.createdAt;
+    //     uint256 discount = auction.discountRate * dt;
+    //     if (auction.startingPrice >= discount) {
+    //         return max(auction.startingPrice - discount, auction.minPrice);
+    //     }
+    //     return auction.minPrice;
+    // }
 
-//         coin.transferFrom(msg.sender, auction.seller, price);
-//         // TODO: update bond?
-//         fyBond.transferFrom(address(this), msg.sender, auction.fyBondId);
+    // function buy(uint256 id) external {
+    //     CollateralAuction memory auction = auctions[id];
+    //     require(auction.state == CollateralAuctionState.Open, "auction not open");
+    //     require(block.timestamp < auction.expiresAt, "auction expired");
 
-//         delete auctions[id];
-//         // TODO: update bond state?
-//     }
+    //     uint256 price = _calcPrice(auction);
+    //     require(price >= auction.minPrice, "price < min price");
 
-//     function seize(uint256 id) external {
-//         CollateralAuction memory auction = auctions[id];
-//         require(auction.state == CollateralAuctionState.Open, "auction not open");
-//         require(block.timestamp >= auction.expiresAt, "auction not expired");
+    //     coin.transferFrom(msg.sender, auction.seller, price);
+    //     // TODO: update bond?
+    //     fyBond.transferFrom(address(this), msg.sender, auction.bondId);
 
-//         delete auctions[id];
+    //     delete auctions[id];
+    //     // TODO: update bond state?
+    // }
 
-//         // TODO: Transfer collateral?
-//         fyBond.burn(auction.fyBondId);
-//         // TODO: update bond state?
-//     }
+    // function seize(uint256 id) external {
+    //     CollateralAuction memory auction = auctions[id];
+    //     require(auction.state == CollateralAuctionState.Open, "auction not open");
+    //     require(block.timestamp >= auction.expiresAt, "auction not expired");
 
-//     function max(uint256 x, uint256 y) private pure returns (uint256) {
-//         return x >= y ? x : y;
-//     }
-// }
+    //     delete auctions[id];
+
+    //     // TODO: Transfer collateral?
+    //     fyBond.burn(auction.bondId);
+    //     // TODO: update bond state?
+    // }
+
+    // function max(uint256 x, uint256 y) private pure returns (uint256) {
+    //     return x >= y ? x : y;
+    // }
+}
