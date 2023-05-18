@@ -9,8 +9,8 @@ import "../Token.sol";
 contract Coin is Token("coin", "coin", 6) {}
 
 struct Bond {
-    uint debt;
-    uint maturity;
+    uint256 debt;
+    uint256 maturity;
 }
 
 contract ZeroCouponBond is ERC721 {
@@ -20,17 +20,20 @@ contract ZeroCouponBond is ERC721 {
     // TODO: redeem anytime
     // TODO: dynamic interest rate
     // TODO: where does the yield come from?
-    uint constant BOND_DURATION = 365 days;
-    uint constant INTEREST_RATE = 0.05 * 1e18;
+    uint256 constant BOND_DURATION = 365 days;
+    uint256 constant INTEREST_RATE = 0.05 * 1e18;
 
-    uint private _id;
-    mapping(uint => Bond) public bonds;
+    address public admin;
+
+    uint256 private _id;
+    mapping(uint256 => Bond) public bonds;
 
     constructor(IERC20 _coin) {
         coin = _coin;
+        admin = msg.sender;
     }
 
-    function buy(uint amount) external returns (uint id) {
+    function buy(uint256 amount) external returns (uint256 id) {
         _id += 1;
         id = _id;
 
@@ -52,20 +55,18 @@ contract ZeroCouponBond is ERC721 {
 
         At maturity the bond is worth M so debt to buyer = bM
         */
-        uint debt = amount * (1e18 + INTEREST_RATE) / 1e18;
+        uint256 debt = amount * (1e18 + INTEREST_RATE) / 1e18;
         require(debt > 0, "debt = 0");
 
-        bonds[id] = Bond({
-            debt: debt,
-            maturity: block.timestamp + BOND_DURATION
-        });
+        bonds[id] =
+            Bond({debt: debt, maturity: block.timestamp + BOND_DURATION});
 
         _mint(msg.sender, id);
 
         coin.transferFrom(msg.sender, address(this), amount);
     }
 
-    function redeem(uint id) external {
+    function redeem(uint256 id) external {
         address owner = _ownerOf[id];
         require(msg.sender == owner, "not authorized");
 
@@ -76,5 +77,10 @@ contract ZeroCouponBond is ERC721 {
         delete bonds[id];
 
         coin.transfer(msg.sender, bond.debt);
+    }
+
+    function withdraw(uint256 amount) external {
+        require(msg.sender == admin, "not authorized");
+        coin.transfer(msg.sender, amount);
     }
 }

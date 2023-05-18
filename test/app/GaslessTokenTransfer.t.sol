@@ -35,8 +35,8 @@ contract GaslessTokenTransferTest is Test {
             sender,
             address(gasless),
             AMOUNT + FEE,
-            deadline,
-            token.nonces(sender)
+            token.nonces(sender),
+            deadline
         );
         (uint8 v, bytes32 r, bytes32 s) =
             vm.sign(SENDER_PRIVATE_KEY, permitHash);
@@ -56,8 +56,8 @@ contract GaslessTokenTransferTest is Test {
         address owner,
         address spender,
         uint256 value,
-        uint256 deadline,
-        uint256 nonce
+        uint256 nonce,
+        uint256 deadline
     ) private view returns (bytes32) {
         return keccak256(
             abi.encodePacked(
