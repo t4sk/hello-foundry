@@ -94,11 +94,13 @@ forge test --match-path test/Console.t.sol -vv
 
 ## Advanced
 
--   [ ] mainnet fork
+-   [x] mainnet fork
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
+
+-   [ ] main fork deal (whale)
 
 TODO: not working right now
 
