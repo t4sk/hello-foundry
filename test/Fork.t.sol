@@ -16,7 +16,7 @@ contract ForkTest is Test {
         weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     }
 
-    function testInc() public {
+    function testDeposit() public {
         uint256 balBefore = weth.balanceOf(address(this));
         console.log("balance before", balBefore);
 
