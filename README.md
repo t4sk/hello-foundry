@@ -111,6 +111,11 @@ TODO: need working example for (mainnet - opt)
 -   [ ] crosschain fork
 
 -   [ ] Fuzzing (assume, bound)
+
+```shell
+forge test --match-path test/Fuzz.t.sol
+```
+
 -   [ ] Invariant
 -   [ ] FFI
 -   [ ] Differential testing
