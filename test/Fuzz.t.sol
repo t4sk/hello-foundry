@@ -10,6 +10,10 @@ import {Bit} from "../src/Bit.sol";
 // - fuzz
 // - assume and bound
 // - stats
+//   (runs: 256, μ: 18301, ~: 10819)
+//   runs - number of tests
+//   μ - mean gas used
+//   ~ - median gas used
 
 contract FuzzTest is Test {
     Bit public b;
@@ -27,12 +31,12 @@ contract FuzzTest is Test {
     }
 
     function testMostSignificantBitManual() public {
-        assertEq(mostSignificantBit(0), 0);
-        assertEq(mostSignificantBit(1), 0);
-        assertEq(mostSignificantBit(2), 1);
-        assertEq(mostSignificantBit(4), 2);
-        assertEq(mostSignificantBit(8), 3);
-        assertEq(mostSignificantBit(type(uint256).max), 255);
+        assertEq(b.mostSignificantBit(0), 0);
+        assertEq(b.mostSignificantBit(1), 0);
+        assertEq(b.mostSignificantBit(2), 1);
+        assertEq(b.mostSignificantBit(4), 2);
+        assertEq(b.mostSignificantBit(8), 3);
+        assertEq(b.mostSignificantBit(type(uint256).max), 255);
     }
 
     function testMostSignificantBitFuzz(uint256 x) public {
@@ -51,8 +55,4 @@ contract FuzzTest is Test {
         uint256 i = b.mostSignificantBit(x);
         assertEq(i, mostSignificantBit(x));
     }
-    // (runs: 256, μ: 18301, ~: 10819)
-    // runs - number of tests
-    // μ - mean gas used
-    // ~ - median gas used
 }
