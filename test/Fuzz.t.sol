@@ -42,9 +42,9 @@ contract FuzzTest is Test {
     function testMostSignificantBitFuzz(uint256 x) public {
         // assume - If false, the fuzzer will discard the current fuzz inputs
         //          and start a new fuzz run
-        // Skip i = 0
+        // Skip x = 0
         // vm.assume(x > 0);
-        // assertGe(x, 0);
+        // assertGt(x, 0);
 
         // bound(input, min, max) - bound input between min and max
         // Bound
