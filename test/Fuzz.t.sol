@@ -6,6 +6,11 @@ import {Bit} from "../src/Bit.sol";
 
 // forge test --match-path test/Fuzz.t.sol
 
+// Topics
+// - fuzz
+// - assume and bound
+// - stats
+
 contract FuzzTest is Test {
     Bit public b;
 
@@ -16,14 +21,32 @@ contract FuzzTest is Test {
     function mostSignificantBit(uint256 x) private pure returns (uint256) {
         uint256 i = 0;
         while ((x >>= 1) > 0) {
-            ++i;
+            i++;
         }
         return i;
     }
 
-    function testMostSignificantBit(uint256 x) public {
-        // Exclude i = 0
-        vm.assume(x > 0);
+    function testMostSignificantBitManual() public {
+        assertEq(mostSignificantBit(0), 0);
+        assertEq(mostSignificantBit(1), 0);
+        assertEq(mostSignificantBit(2), 1);
+        assertEq(mostSignificantBit(4), 2);
+        assertEq(mostSignificantBit(8), 3);
+        assertEq(mostSignificantBit(type(uint256).max), 255);
+    }
+
+    function testMostSignificantBitFuzz(uint256 x) public {
+        // assume - If false, the fuzzer will discard the current fuzz inputs
+        //          and start a new fuzz run
+        // Skip i = 0
+        // vm.assume(x > 0);
+        // assertGe(x, 0);
+
+        // bound(input, min, max) - bound input between min and max
+        // Bound
+        x = bound(x, 1, 10);
+        // assertGe(x, 1);
+        // assertLe(x, 10);
 
         uint256 i = b.mostSignificantBit(x);
         assertEq(i, mostSignificantBit(x));

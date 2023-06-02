@@ -100,17 +100,15 @@ forge test --match-path test/Console.t.sol -vv
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
 
--   [ ] main fork deal (whale)
+-   [x] main fork deal (whale)
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Whale.t.sol -vvv
 ```
 
-TODO: not working right now
+TODO: need working example for (mainnet - opt)
 
 -   [ ] crosschain fork
-
-    -   token bridge
 
 -   [ ] Fuzzing (assume, bound)
 -   [ ] Invariant
