@@ -1,6 +1,6 @@
 pragma solidity 0.8.18;
 
-contract WETH9 {
+contract WETH {
     string public name = "Wrapped Ether";
     string public symbol = "WETH";
     uint8 public decimals = 18;
@@ -13,7 +13,7 @@ contract WETH9 {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-    fallback() external payable {
+    receive() external payable {
         deposit();
     }
 
@@ -23,7 +23,6 @@ contract WETH9 {
     }
 
     function withdraw(uint256 wad) public {
-        require(balanceOf[msg.sender] >= wad);
         balanceOf[msg.sender] -= wad;
         payable(msg.sender).transfer(wad);
         emit Withdrawal(msg.sender, wad);
@@ -47,12 +46,9 @@ contract WETH9 {
         public
         returns (bool)
     {
-        require(balanceOf[src] >= wad);
-
         if (
             src != msg.sender && allowance[src][msg.sender] != type(uint256).max
         ) {
-            require(allowance[src][msg.sender] >= wad);
             allowance[src][msg.sender] -= wad;
         }
 

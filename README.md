@@ -110,13 +110,23 @@ TODO: need working example for (mainnet - opt)
 
 -   [ ] crosschain fork
 
--   [ ] Fuzzing (assume, bound)
+-   [x] Fuzzing (assume, bound)
 
 ```shell
 forge test --match-path test/Fuzz.t.sol
 ```
 
 -   [ ] Invariant
+
+```shell
+# Open testing
+forge test --match-path test/invariants/Invariant_1.t.sol -vvv
+# Handler
+forge test --match-path test/invariants/Invariant_2.t.sol -vvv
+# Actor management
+forge test --match-path test/invariants/Invariant_3.t.sol -vvv
+```
+
 -   [ ] FFI
 -   [ ] Differential testing
 

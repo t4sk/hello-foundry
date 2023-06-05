@@ -4,11 +4,10 @@ pragma solidity ^0.8.18;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "forge-std/InvariantTest.sol";
-import {WETH9} from "../src/WETH9.sol";
+import {WETH} from "../src/WETH.sol";
 
 // https://mirror.xyz/horsefacts.eth/Jex2YVaO65dda6zEyfM_-DXlXhOWCAoSpOx5PLocYgw
 
-// TODO: test english auction?
 // TODO: conditional invariant
 // invariant target
 // ghost variables
@@ -17,11 +16,11 @@ import {WETH9} from "../src/WETH9.sol";
 // actor management
 // TODO: target selectors
 
-contract WETH9_Open_Invariant_Tests is Test, InvariantTest {
-    WETH9 public weth;
+contract WETH_Open_Invariant_Tests is Test, InvariantTest {
+    WETH public weth;
 
     function setUp() public {
-        weth = new WETH9();
+        weth = new WETH();
     }
 
     // NOTE: - calls = runs x depth
@@ -38,10 +37,10 @@ import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 
 contract Handler is CommonBase, StdCheats, StdUtils {
-    WETH9 private weth;
+    WETH private weth;
     uint256 public wethBalance;
 
-    constructor(WETH9 _weth) {
+    constructor(WETH _weth) {
         weth = _weth;
     }
 
@@ -68,14 +67,14 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
 }
 
-contract WETH9_Handler_Based_Invariant_Tests is Test, InvariantTest {
-    WETH9 public weth;
+contract WETH_Handler_Based_Invariant_Tests is Test, InvariantTest {
+    WETH public weth;
     Handler public handler;
 
     uint256 private constant ETH_SUPPLY = 10 ether;
 
     function setUp() public {
-        weth = new WETH9();
+        weth = new WETH();
         handler = new Handler(weth);
 
         // Send 10 ETH to handler
@@ -111,15 +110,15 @@ contract ActorManager is CommonBase, StdCheats, StdUtils {
     }
 }
 
-contract WETH9_Multi_Handler_Invariant_Tests is Test, InvariantTest {
-    WETH9 public weth;
+contract WETH_Multi_Handler_Invariant_Tests is Test, InvariantTest {
+    WETH public weth;
     ActorManager public manager;
     Handler[] public handlers;
 
     uint256 private constant ETH_SUPPLY = 10 ether;
 
     function setUp() public {
-        weth = new WETH9();
+        weth = new WETH();
 
         for (uint256 i = 0; i < 3; i++) {
             handlers.push(new Handler(weth));
