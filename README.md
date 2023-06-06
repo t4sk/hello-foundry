@@ -120,6 +120,7 @@ forge test --match-path test/Fuzz.t.sol
 
 ```shell
 # Open testing
+forge test --match-path test/invariants/Invariant_0.t.sol -vvv
 forge test --match-path test/invariants/Invariant_1.t.sol -vvv
 # Handler
 forge test --match-path test/invariants/Invariant_2.t.sol -vvv

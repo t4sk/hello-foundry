@@ -6,10 +6,8 @@ import "forge-std/console.sol";
 import "forge-std/InvariantTest.sol";
 import {WETH} from "../../src/WETH.sol";
 
-// Topics
-// - invariant
-// - difference between fuzz and invariant
-// - runs, calls, reverts
+// https://book.getfoundry.sh/forge/invariant-testing?highlight=targetSelector#invariant-targets
+// https://mirror.xyz/horsefacts.eth/Jex2YVaO65dda6zEyfM_-DXlXhOWCAoSpOx5PLocYgw
 
 // NOTE: open testing - randomly call all public functions
 contract WETH_Open_Invariant_Tests is Test, InvariantTest {
@@ -22,7 +20,6 @@ contract WETH_Open_Invariant_Tests is Test, InvariantTest {
     receive() external payable {}
 
     // NOTE: - calls = runs x depth, (runs, calls, reverts)
-
     function invariant_totalSupply_is_always_zero() public {
         assertEq(0, weth.totalSupply());
     }
