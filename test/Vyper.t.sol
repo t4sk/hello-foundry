@@ -1,13 +1,12 @@
 pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
-import "forge-std/InvariantTest.sol";
 import "../lib/utils/VyperDeployer.sol";
 import "../src/IVyperStorage.sol";
 
 // source venv/bin/activate
 // forge test --match-path test/Vyper.t.sol --ffi
-contract VyperStorageTest is Test, InvariantTest {
+contract VyperStorageTest is Test {
     VyperDeployer vyperDeployer = new VyperDeployer();
 
     IVyperStorage vyStorage;

@@ -3,7 +3,6 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-import "forge-std/InvariantTest.sol";
 import {WETH} from "../../src/WETH.sol";
 
 // Topics
@@ -56,7 +55,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
 }
 
-contract WETH_Handler_Based_Invariant_Tests is Test, InvariantTest {
+contract WETH_Handler_Based_Invariant_Tests is Test {
     WETH public weth;
     Handler public handler;
 

@@ -3,7 +3,6 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-import "forge-std/InvariantTest.sol";
 
 // Topics
 // - Invariant
@@ -25,7 +24,7 @@ contract InvariantIntro {
     }
 }
 
-contract IntroInvariantTest is Test, InvariantTest {
+contract IntroInvariantTest is Test {
     InvariantIntro private target;
 
     function setUp() public {
