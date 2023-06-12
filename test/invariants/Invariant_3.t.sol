@@ -61,7 +61,7 @@ contract WETH_Multi_Handler_Invariant_Tests is Test {
             total += handlers[i].wethBalance();
             console.log("Handler num calls", i, handlers[i].numCalls());
         }
-        console.log("ETH total", total);
+        console.log("ETH total", total / 1e18);
         assertGe(address(weth).balance, total);
     }
 }

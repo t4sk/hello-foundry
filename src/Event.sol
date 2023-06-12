@@ -7,11 +7,7 @@ contract Event {
         emit Transfer(from, to, amount);
     }
 
-    function transferMany(
-        address from,
-        address[] calldata to,
-        uint256[] calldata amounts
-    ) external {
+    function transferMany(address from, address[] calldata to, uint256[] calldata amounts) external {
         for (uint256 i = 0; i < to.length; i++) {
             emit Transfer(from, to[i], amounts[i]);
         }

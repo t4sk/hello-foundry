@@ -17,9 +17,7 @@ contract GaslessTokenTransfer {
         bytes32 s
     ) external {
         // Permit
-        IERC20Permit(token).permit(
-            sender, address(this), amount + fee, deadline, v, r, s
-        );
+        IERC20Permit(token).permit(sender, address(this), amount + fee, deadline, v, r, s);
         // Send amount to receiver
         IERC20Permit(token).transferFrom(sender, receiver, amount);
         // Take fee - send fee to msg.sender

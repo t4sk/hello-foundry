@@ -58,8 +58,7 @@ contract ZeroCouponBond is ERC721 {
         uint256 debt = amount * (1e18 + INTEREST_RATE) / 1e18;
         require(debt > 0, "debt = 0");
 
-        bonds[id] =
-            Bond({debt: debt, maturity: block.timestamp + BOND_DURATION});
+        bonds[id] = Bond({debt: debt, maturity: block.timestamp + BOND_DURATION});
 
         _mint(msg.sender, id);
 

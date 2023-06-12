@@ -17,11 +17,7 @@ contract PingPong {
 }
 
 interface IL1_CrossDomainMessenger {
-    function sendMessage(
-        address target,
-        bytes calldata message,
-        uint32 gasLimit
-    ) external;
+    function sendMessage(address target, bytes calldata message, uint32 gasLimit) external;
 }
 
 contract CrossChainTest is Test {
@@ -34,8 +30,7 @@ contract CrossChainTest is Test {
     address mainPingPong;
     address opPingPong;
 
-    IL1_CrossDomainMessenger private L1_messenger =
-        IL1_CrossDomainMessenger(0xd9166833FF12A5F900ccfBf2c8B62a90F1Ca1FD5);
+    IL1_CrossDomainMessenger private L1_messenger = IL1_CrossDomainMessenger(0xd9166833FF12A5F900ccfBf2c8B62a90F1Ca1FD5);
 
     function setUp() public {
         string memory MAINNET_FORK_URL = vm.envString("MAINNET_FORK_URL");
@@ -57,9 +52,7 @@ contract CrossChainTest is Test {
         vm.selectFork(mainnet);
         assertEq(vm.activeFork(), mainnet);
 
-        L1_messenger.sendMessage(
-            opPingPong, abi.encodeCall(PingPong.ping, (123)), 1000000
-        );
+        L1_messenger.sendMessage(opPingPong, abi.encodeCall(PingPong.ping, (123)), 1000000);
 
         // select optimism
         vm.selectFork(opt);

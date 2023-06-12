@@ -21,8 +21,7 @@ contract PrepaidForwardTest is Test {
     function setUp() public {
         underlying = new Token("underlying", "underlying", 18);
         payToken = new Token("pay", "pay", 18);
-        prepaidForward =
-        new PrepaidForward(underlying, payToken, SELLER, QUANTITY, STRIKE, MATURITY);
+        prepaidForward = new PrepaidForward(underlying, payToken, SELLER, QUANTITY, STRIKE, MATURITY);
 
         underlying.mint(SELLER, QUANTITY);
 
