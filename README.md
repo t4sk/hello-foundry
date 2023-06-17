@@ -116,7 +116,7 @@ TODO: need working example for (mainnet - opt)
 forge test --match-path test/Fuzz.t.sol
 ```
 
--   [ ] Invariant
+-   [x] Invariant
 
 ```shell
 # Open testing
@@ -129,7 +129,17 @@ forge test --match-path test/invariants/Invariant_3.t.sol -vvv
 ```
 
 -   [ ] FFI
+
+```shell
+forge test --match-path test/FFI.t.sol --ffi -vvv
+
+```
+
 -   [ ] Differential testing
+
+```shell
+FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi -vvv
+```
 
 ```shell
 # virtual env
