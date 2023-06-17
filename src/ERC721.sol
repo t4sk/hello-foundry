@@ -4,9 +4,15 @@ pragma solidity ^0.8.17;
 import "./interfaces/IERC721.sol";
 
 contract ERC721 is IERC721 {
-    event Transfer(address indexed from, address indexed to, uint256 indexed id);
-    event Approval(address indexed owner, address indexed spender, uint256 indexed id);
-    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+    event Transfer(
+        address indexed from, address indexed to, uint256 indexed id
+    );
+    event Approval(
+        address indexed owner, address indexed spender, uint256 indexed id
+    );
+    event ApprovalForAll(
+        address indexed owner, address indexed operator, bool approved
+    );
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) internal _ownerOf;
@@ -20,8 +26,13 @@ contract ERC721 is IERC721 {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) public isApprovedForAll;
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-        return interfaceId == type(IERC721).interfaceId || interfaceId == type(IERC165).interfaceId;
+    function supportsInterface(bytes4 interfaceId)
+        external
+        pure
+        returns (bool)
+    {
+        return interfaceId == type(IERC721).interfaceId
+            || interfaceId == type(IERC165).interfaceId;
     }
 
     function ownerOf(uint256 id) external view returns (address owner) {
@@ -41,7 +52,10 @@ contract ERC721 is IERC721 {
 
     function approve(address spender, uint256 id) external {
         address owner = _ownerOf[id];
-        require(msg.sender == owner || isApprovedForAll[owner][msg.sender], "not authorized");
+        require(
+            msg.sender == owner || isApprovedForAll[owner][msg.sender],
+            "not authorized"
+        );
 
         _approvals[id] = spender;
 
@@ -53,8 +67,15 @@ contract ERC721 is IERC721 {
         return _approvals[id];
     }
 
-    function _isApprovedOrOwner(address owner, address spender, uint256 id) internal view returns (bool) {
-        return (spender == owner || isApprovedForAll[owner][spender] || spender == _approvals[id]);
+    function _isApprovedOrOwner(address owner, address spender, uint256 id)
+        internal
+        view
+        returns (bool)
+    {
+        return (
+            spender == owner || isApprovedForAll[owner][spender]
+                || spender == _approvals[id]
+        );
     }
 
     function transferFrom(address from, address to, uint256 id) public {
@@ -83,7 +104,12 @@ contract ERC721 is IERC721 {
         );
     }
 
-    function safeTransferFrom(address from, address to, uint256 id, bytes calldata data) external {
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        bytes calldata data
+    ) external {
         transferFrom(from, to, id);
 
         require(

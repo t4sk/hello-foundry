@@ -39,7 +39,9 @@ contract DifferentialTest is Test {
 
         assertGe(y1, 0);
 
-        console.log("y", uint256(int256(y0 / 2 ** 64)), uint256(int256(y1 / 2 ** 64)));
+        console.log(
+            "y", uint256(int256(y0 / 2 ** 64)), uint256(int256(y1 / 2 ** 64))
+        );
 
         uint256 DELTA = 2 ** 64;
         assertApproxEqAbs(uint256(int256(y0)), uint256(int256(y1)), DELTA);

@@ -31,11 +31,20 @@ contract GaslessTokenTransferTest is Test {
         uint256 deadline = block.timestamp + 60;
 
         // Sender - prepare permit signature
-        bytes32 permitHash = _getPermitHash(sender, address(gasless), AMOUNT + FEE, token.nonces(sender), deadline);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(SENDER_PRIVATE_KEY, permitHash);
+        bytes32 permitHash = _getPermitHash(
+            sender,
+            address(gasless),
+            AMOUNT + FEE,
+            token.nonces(sender),
+            deadline
+        );
+        (uint8 v, bytes32 r, bytes32 s) =
+            vm.sign(SENDER_PRIVATE_KEY, permitHash);
 
         // Execute transfer
-        gasless.send(address(token), sender, receiver, AMOUNT, FEE, deadline, v, r, s);
+        gasless.send(
+            address(token), sender, receiver, AMOUNT, FEE, deadline, v, r, s
+        );
 
         // Check balances
         assertEq(token.balanceOf(sender), 0, "sender balance");
@@ -43,18 +52,22 @@ contract GaslessTokenTransferTest is Test {
         assertEq(token.balanceOf(address(this)), FEE, "fee");
     }
 
-    function _getPermitHash(address owner, address spender, uint256 value, uint256 nonce, uint256 deadline)
-        private
-        view
-        returns (bytes32)
-    {
+    function _getPermitHash(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 nonce,
+        uint256 deadline
+    ) private view returns (bytes32) {
         return keccak256(
             abi.encodePacked(
                 "\x19\x01",
                 token.DOMAIN_SEPARATOR(),
                 keccak256(
                     abi.encode(
-                        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
+                        keccak256(
+                            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+                        ),
                         owner,
                         spender,
                         value,

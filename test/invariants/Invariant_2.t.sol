@@ -74,7 +74,9 @@ contract WETH_Handler_Based_Invariant_Tests is Test {
         selectors[2] = Handler.sendToFallback.selector;
 
         // Handler.fail() not called
-        targetSelector(FuzzSelector({addr: address(handler), selectors: selectors}));
+        targetSelector(
+            FuzzSelector({addr: address(handler), selectors: selectors})
+        );
     }
 
     function invariant_eth_balance() public {
