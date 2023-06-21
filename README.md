@@ -138,17 +138,16 @@ forge test --match-path test/FFI.t.sol --ffi -vvv
 -   [ ] Differential testing
 
 ```shell
-pip install eth-abi
-FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi -vvv
-```
-
-```shell
 # virtual env
 python3 -m pip install --user virtualenv
 virtualenv -p python3 venv
 source venv/bin/activate
 
 pip install eth-abi
+```
+
+```shell
+FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi -vvv
 ```
 
 ## Misc
