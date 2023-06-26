@@ -128,14 +128,13 @@ forge test --match-path test/invariants/Invariant_2.t.sol -vvv
 forge test --match-path test/invariants/Invariant_3.t.sol -vvv
 ```
 
--   [ ] FFI
+-   [x] FFI
 
 ```shell
 forge test --match-path test/FFI.t.sol --ffi -vvv
-
 ```
 
--   [ ] Differential testing
+-   [x] Differential testing
 
 ```shell
 # virtual env
@@ -151,8 +150,6 @@ FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi 
 ```
 
 ## Misc
-
--   forge geiger
 
 -   [ ] Vyper
 
@@ -176,12 +173,6 @@ vyper --version
 2. Declare Solidity interface inside `src`
 3. Copy & paste `lib/utils/VyperDeployer.sol`
 4. Write test
-
--   [ ] print vyper
-
-```
-print("HERE", convert(123, uint256), hardhat_compat=True)
-```
 
 ```shell
 forge test --match-path test/Vyper.t.sol --ffi

@@ -24,10 +24,9 @@ contract VyperStorageTest is Test {
         assertEq(val, 1234);
     }
 
-    function testStore(uint256 _val) public {
-        vyStorage.store(_val);
-        uint256 val = vyStorage.get();
-        assertEq(val, _val);
+    function testStore(uint256 val) public {
+        vyStorage.store(val);
+        assertEq(vyStorage.get(), val);
     }
 
     function invariant_test() public {
