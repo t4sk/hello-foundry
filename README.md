@@ -151,7 +151,7 @@ FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi 
 
 ## Misc
 
--   [ ] Vyper
+-   [x] Vyper
 
 https://github.com/0xKitsune/Foundry-Vyper
 
