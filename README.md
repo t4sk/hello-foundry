@@ -6,20 +6,20 @@ https://book.getfoundry.sh/
 
 ## Basic
 
--   [x] Install
+- [x] Install
 
 ```shell
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
--   [x] Init
+- [x] Init
 
 ```shell
 forge init
 ```
 
--   [x] Basic commands
+- [x] Basic commands
 
 ```shell
 forge build
@@ -29,12 +29,12 @@ forge test --match-path test/HelloWorld -vvvv
 
 ---
 
--   [x] Test
-    -   counter app
-    -   test setup, ok, fail
-    -   match
-    -   verbose
-    -   gas report
+- [x] Test
+  - counter app
+  - test setup, ok, fail
+  - match
+  - verbose
+  - gas report
 
 ```shell
 forge test --match-path test/Counter.t.sol -vvv --gas-report
@@ -42,13 +42,13 @@ forge test --match-path test/Counter.t.sol -vvv --gas-report
 
 ---
 
--   [x] Solidity version and optimizer settings
+- [x] Solidity version and optimizer settings
 
 https://github.com/foundry-rs/foundry/tree/master/config
 
 ---
 
--   [x] Remapping
+- [x] Remapping
 
 ```shell
 forge remappings
@@ -61,7 +61,7 @@ npm i @openzeppelin/contracts
 
 ---
 
--   [x] Formatter
+- [x] Formatter
 
 ```shell
 forge fmt
@@ -71,7 +71,7 @@ forge fmt
 
 ---
 
--   [x] console (Counter, test, log int)
+- [x] console (Counter, test, log int)
 
 ```shell
 forge test --match-path test/Console.t.sol -vv
@@ -81,26 +81,26 @@ forge test --match-path test/Console.t.sol -vv
 
 ---
 
--   [x] Test auth
--   [x] Test error
-    -   `vm.expectRevert`
-    -   `require` error message
-    -   custom error
-    -   label assertions
--   [x] Test event (expectEmit)
--   [x] Test time (`Auction.sol`)
--   [x] Test send eth (`Wallet.sol`) - hoax, deal
--   [x] Test signature
+- [x] Test auth
+- [x] Test error
+  - `vm.expectRevert`
+  - `require` error message
+  - custom error
+  - label assertions
+- [x] Test event (expectEmit)
+- [x] Test time (`Auction.sol`)
+- [x] Test send eth (`Wallet.sol`) - hoax, deal
+- [x] Test signature
 
 ## Advanced
 
--   [x] mainnet fork
+- [x] mainnet fork
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Fork.t.sol -vvv
 ```
 
--   [x] main fork deal (whale)
+- [x] main fork deal (whale)
 
 ```shell
 forge test --fork-url $FORK_URL --match-path test/Whale.t.sol -vvv
@@ -108,15 +108,15 @@ forge test --fork-url $FORK_URL --match-path test/Whale.t.sol -vvv
 
 TODO: need working example for (mainnet - opt)
 
--   [ ] crosschain fork
+- [ ] crosschain fork
 
--   [x] Fuzzing (assume, bound)
+- [x] Fuzzing (assume, bound)
 
 ```shell
 forge test --match-path test/Fuzz.t.sol
 ```
 
--   [x] Invariant
+- [x] Invariant
 
 ```shell
 # Open testing
@@ -128,13 +128,13 @@ forge test --match-path test/invariants/Invariant_2.t.sol -vvv
 forge test --match-path test/invariants/Invariant_3.t.sol -vvv
 ```
 
--   [x] FFI
+- [x] FFI
 
 ```shell
 forge test --match-path test/FFI.t.sol --ffi -vvv
 ```
 
--   [x] Differential testing
+- [x] Differential testing
 
 ```shell
 # virtual env
@@ -151,7 +151,7 @@ FOUNDRY_FUZZ_RUNS=100 forge test --match-path test/DifferentialTest.t.sol --ffi 
 
 ## Misc
 
--   [x] Vyper
+- [x] Vyper
 
 https://github.com/0xKitsune/Foundry-Vyper
 
@@ -178,13 +178,20 @@ vyper --version
 forge test --match-path test/Vyper.t.sol --ffi
 ```
 
--   [ ] ignore error code
+- [ ] ignore error code
 
 ```
 ignored_error_codes = ["license", "unused-param", "unused-var"]
 ```
 
--   [ ] Forge geiger
+- [ ] Deploy
+
+```shell
+source .env
+forge script script/Token.s.sol:TokenScript --rpc-url $GOERLI_RPC_URL --broadcast --verify -vvvv
+```
+
+- [ ] Forge geiger
 
 ```shell
 forge geiger
@@ -192,7 +199,7 @@ forge geiger
 
 # TODO:
 
--   chisel?
--   debugger?
--   forge snapshot?
--   script?
+- chisel?
+- debugger?
+- forge snapshot?
+- script?
