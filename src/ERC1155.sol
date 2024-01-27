@@ -86,7 +86,7 @@ contract ERC1155 is IERC1155 {
     {
         require(owners.length == ids.length, "owners length != ids length");
 
-        balances = new uint[](owners.length);
+        balances = new uint256[](owners.length);
 
         unchecked {
             for (uint256 i = 0; i < owners.length; i++) {

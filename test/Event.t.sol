@@ -44,7 +44,7 @@ contract EventTest is Test {
         to[0] = address(111);
         to[1] = address(222);
 
-        uint256[] memory amounts = new uint[](2);
+        uint256[] memory amounts = new uint256[](2);
         amounts[0] = 1;
         amounts[1] = 2;
 
