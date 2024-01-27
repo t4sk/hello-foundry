@@ -1,4 +1,4 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.20;
 
 contract Event {
     event Transfer(address indexed from, address indexed to, uint256 amount);
