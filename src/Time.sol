@@ -1,4 +1,4 @@
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 contract Auction {
     uint256 public startAt = block.timestamp + 1 days;

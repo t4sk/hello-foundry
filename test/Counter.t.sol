@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 import "forge-std/Test.sol";
 import {Counter} from "../src/Counter.sol";

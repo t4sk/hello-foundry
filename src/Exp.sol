@@ -1,4 +1,4 @@
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 // https://github.com/abdk-consulting/abdk-libraries-solidity/blob/master/ABDKMath64x64.sol
 

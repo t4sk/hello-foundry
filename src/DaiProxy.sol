@@ -1,4 +1,4 @@
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 address constant PROXY_REGISTRY = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
 address constant PROXY_ACTIONS = 0x82ecD135Dce65Fbc6DbdD0e4237E0AF93FFD5038;

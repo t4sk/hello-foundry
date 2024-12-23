@@ -1,4 +1,4 @@
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 interface IVyperStorage {
     function store(uint256 val) external;
