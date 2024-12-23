@@ -1,8 +1,16 @@
 # hello-foundry
 
-https://github.com/foundry-rs/foundry
+[Foundry](https://github.com/foundry-rs/foundry)
 
-https://book.getfoundry.sh/
+[Book](https://book.getfoundry.sh/)
+
+## Install
+
+```shell
+git clone git@github.com:t4sk/hello-foundry.git
+npm i
+forge build
+```
 
 ## Basic
 
