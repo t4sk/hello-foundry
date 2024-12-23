@@ -192,11 +192,34 @@ forge test --match-path test/Vyper.t.sol --ffi
 ignored_error_codes = ["license", "unused-param", "unused-var"]
 ```
 
-- [ ] Deploy
+- [x] Deploy
 
 ```shell
 source .env
 forge script script/Token.s.sol:TokenScript --rpc-url $GOERLI_RPC_URL --broadcast --verify -vvvv
+```
+
+- [ ] Use wallet from cast in script
+
+```shell
+# Import wallet from private key
+PK=...
+ACCOUNT=burner
+cast wallet import --private-key $PK $ACCOUNT
+
+# Deploy
+FORK_URL=...
+ETHERSCAN_API_KEY=...
+MSG_SENDER=...
+
+forge script script/Deploy.sol:Deploy \
+--rpc-url $FORK_URL \
+-vvv \
+--keystore ~/.foundry/keystores/$ACCOUNT \
+--sender $MSG_SENDER \
+--broadcast \
+--verify \
+--etherscan-api-key $ETHERSCAN_API_KEY
 ```
 
 - [ ] Forge geiger
